@@ -29,7 +29,7 @@ final class ParkingSlot {
     init(badgeId: String, lot: ParkingLot) {
         self.timestamp = Date.now
         self.lot = lot
-        self.bayNumber = 0
+        self.bayNumber = lot.slots.count + 1
         self.badgeId = badgeId
     }
 }

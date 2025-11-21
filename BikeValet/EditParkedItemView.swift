@@ -1,5 +1,5 @@
 //
-//  EditItem.swift
+//  EditParkedItemView.swift
 //  BikeValet
 //
 //  Created by Todd Anderson on 11/20/25.
@@ -11,7 +11,7 @@ struct EditParkedItem: View {
 
     var body: some View {
         NavigationStack {
-            DetailEditView(scrum: nil)
+            Text("Edit Parked Item")
         }
     }
 }
