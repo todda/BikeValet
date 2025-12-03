@@ -10,8 +10,9 @@ import SwiftData
 
 @Model
 final class ParkingLot {
+    //@Relationship(deleteRule: .cascade, inverse: \ParkingSlot.lot)
     var lotName: String
-    @Relationship(deleteRule: .cascade, inverse: \ParkingSlot.lot) var slots: [ParkingSlot]
+    var slots: [ParkingSlot]
 
     init(name: String, slots: [ParkingSlot] = []) {
         self.lotName = name
@@ -21,9 +22,11 @@ final class ParkingLot {
 
 @Model
 final class ParkingSlot {
+    @Relationship(deleteRule: .cascade, inverse: \ParkingLot.slots)
+
+    var lot: ParkingLot?
     var timestamp: Date
     var badgeId: String
-    var lot: ParkingLot
     var bayNumber: Int
 
     init(badgeId: String, lot: ParkingLot) {
