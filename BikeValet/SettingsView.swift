@@ -7,24 +7,41 @@
 
 import SwiftUI
 import SwiftData
+internal import Combine
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) var dismiss
     @Query private var parkingSlots: [ParkingSlot]
     @State private var isPresentingAlert: Bool = false
+    @State var slotSearchNumber = ""
 
     var body: some View {
         NavigationStack {
             VStack {
-                List(parkingSlots) { slot in
-                    HStack {
-                        Text(slot.lot?.lotName ?? "unknown")
-                        Text(slot.badgeId)
-                        Text("\(value: slot.bayNumber)")
-                        Button("Edit", systemImage: "pencil", action: {
-                            //EditParkedItem()
-                        })
+                List {
+                    if slotSearchNumber.isEmpty {
+                        ForEach(parkingSlots) { slot in
+                            HStack {
+                                Text(slot.lot?.lotName ?? "unknown")
+                                Text(slot.badgeId)
+                                Text("\(value: slot.bayNumber)")
+                                Button("Edit", systemImage: "pencil", action: {
+                                    //EditParkedItem()
+                                })
+                            }
+                        }
+                    } else {
+                        ForEach(parkingSlots.filter { slot in slot.bayNumber == Int(slotSearchNumber)}) { slot in
+                            HStack {
+                                Text(slot.lot?.lotName ?? "unknown")
+                                Text(slot.badgeId)
+                                Text("\(value: slot.bayNumber)")
+                                Button("Edit", systemImage: "pencil", action: {
+                                    //EditParkedItem()
+                                })
+                            }
+                        }
                     }
                 }
                 HStack {
@@ -49,7 +66,7 @@ struct SettingsView: View {
                     }
                 }.padding(20)
             }
-        }
+            }.searchable(text: $slotSearchNumber, prompt: "Find by parking slot number").keyboardType(.numberPad)
     }
 }
 

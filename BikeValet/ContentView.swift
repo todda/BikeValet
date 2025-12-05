@@ -17,6 +17,7 @@ struct ContentView: View {
     @State private var checkedIn: Bool = false
     @State private var editItemPressed = false
     @State private var settingsPressed = false
+    @FocusState private var focusConfirm: Bool
     @State private var occupiedSlot: ParkingSlot? = nil
 
     var body: some View {
@@ -32,8 +33,13 @@ struct ContentView: View {
                     Spacer()
                     VStack {
                         TextField("333", text: $cardNumber)
+                            .focused($focusConfirm)
+                            .textSelection(.disabled)
                             .background(Color.accent)
                             .font(.system(size: 26))
+                            .onAppear() {
+                                focusConfirm = true
+                            }
                             .multilineTextAlignment(.center).onSubmit {
                                 occupiedSlot = parkingSlots.first(where: { $0.badgeId == cardNumber })
                                 if ((occupiedSlot) != nil) {
@@ -51,6 +57,8 @@ struct ContentView: View {
                                         print ("oh no")
                                     }
                                 }
+                                cardNumber = ""
+                                focusConfirm = true
                             }
                         GeometryReader { cell in
                             VStack {
