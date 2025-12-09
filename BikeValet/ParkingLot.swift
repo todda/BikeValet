@@ -23,8 +23,7 @@ final class ParkingLot {
 @Model
 final class ParkingSlot {
     @Relationship(deleteRule: .cascade, inverse: \ParkingLot.slots)
-
-    var lot: ParkingLot?
+    var lot: ParkingLot
     var timestamp: Date
     var badgeId: String
     var bayNumber: Int

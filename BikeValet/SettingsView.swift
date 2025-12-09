@@ -23,7 +23,7 @@ struct SettingsView: View {
                     if slotSearchNumber.isEmpty {
                         ForEach(parkingSlots) { slot in
                             HStack {
-                                Text(slot.lot?.lotName ?? "unknown")
+                                Text(slot.lot.lotName)
                                 Text(slot.badgeId)
                                 Text("\(value: slot.bayNumber)")
                                 Button("Edit", systemImage: "pencil", action: {
@@ -34,7 +34,7 @@ struct SettingsView: View {
                     } else {
                         ForEach(parkingSlots.filter { slot in slot.bayNumber == Int(slotSearchNumber)}) { slot in
                             HStack {
-                                Text(slot.lot?.lotName ?? "unknown")
+                                Text(slot.lot.lotName)
                                 Text(slot.badgeId)
                                 Text("\(value: slot.bayNumber)")
                                 Button("Edit", systemImage: "pencil", action: {
@@ -52,8 +52,16 @@ struct SettingsView: View {
                         isPresented: $isPresentingAlert) {
                         Button("Yes, delete all", role: .destructive) {
                             do {
-                                //try modelContext.delete(model: ParkingLot.self)
                                 try modelContext.delete(model: ParkingSlot.self)
+
+                                let initialData: [ParkingLot] = [
+                                    ParkingLot(name: "Main"),
+                                    ParkingLot(name: "Oversized"),
+                                ]
+                                for lot in initialData {
+                                    modelContext.insert(lot)
+                                }
+
                                 dismiss()
                             } catch {
                                 print("Failed to delete all.")
