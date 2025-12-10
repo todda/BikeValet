@@ -104,7 +104,7 @@ struct ContentView: View {
                 }.padding(100)
             }
         }.sheet(isPresented: $editItemPressed, content: {
-            EditParkedItem()
+            EditParkedItem(oldSlot: parkingSlots[parkingSlots.count - 1])
         })
         .sheet(isPresented: $settingsPressed, content: {
             SettingsView()

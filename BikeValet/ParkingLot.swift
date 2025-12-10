@@ -10,7 +10,7 @@ import SwiftData
 
 @Model
 final class ParkingLot {
-    //@Relationship(deleteRule: .cascade, inverse: \ParkingSlot.lot)
+    @Relationship(deleteRule: .cascade, inverse: \ParkingSlot.lot)
     var lotName: String
     var slots: [ParkingSlot]
 
@@ -22,7 +22,7 @@ final class ParkingLot {
 
 @Model
 final class ParkingSlot {
-    @Relationship(deleteRule: .cascade, inverse: \ParkingLot.slots)
+    //@Relationship(deleteRule: .cascade, inverse: \ParkingLot.slots)
     var lot: ParkingLot
     var timestamp: Date
     var badgeId: String

@@ -53,15 +53,6 @@ struct SettingsView: View {
                         Button("Yes, delete all", role: .destructive) {
                             do {
                                 try modelContext.delete(model: ParkingSlot.self)
-
-                                let initialData: [ParkingLot] = [
-                                    ParkingLot(name: "Main"),
-                                    ParkingLot(name: "Oversized"),
-                                ]
-                                for lot in initialData {
-                                    modelContext.insert(lot)
-                                }
-
                                 dismiss()
                             } catch {
                                 print("Failed to delete all.")
