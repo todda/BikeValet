@@ -24,22 +24,33 @@ struct ContentView: View {
         NavigationStack {
             VStack {
                 HStack {
-                    Text("Current Checkins: \(value: parkingSlots.count)")
+                    NavigationLink {
+                        SettingsView()
+                    } label: {
+                        Text(Image(systemName: "gearshape.fill"))
+                    }
                     Spacer()
+                    NavigationLink {
+                        if (parkingSlots.count > 0) {
+                            EditParkedItem(oldSlot: parkingSlots[parkingSlots.count - 1])
+                        }
+                    } label: {
+                        Text("Edit Last")
+                    }
                 }.padding(100)
                 Spacer()
-                HStack {
-                    Picker(selection: $selectedLotId, label: Text("Current Lot:")) {
-                        ForEach(0 ..< parkingLots.count, id: \.self) {
-                            Text(parkingLots[$0].lotName)
-                        }
-                    }.pickerStyle(.segmented)
-                }.padding(100)
                 VStack {
+                    HStack {
+                        Picker(selection: $selectedLotId, label: Text("Current Lot:")) {
+                            ForEach(0 ..< parkingLots.count, id: \.self) {
+                                Text(parkingLots[$0].lotName)
+                            }
+                        }.pickerStyle(.segmented)
+                    }.padding(10)
                     TextField("Waiting for card scan", text: $cardNumber)
                         .focused($focusConfirm)
                         .textSelection(.disabled)
-                        .background(Color.accent)
+                        .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill(.accent))
                         .font(.system(size: 26))
                         .onAppear() {
                             focusConfirm = true
@@ -66,17 +77,6 @@ struct ContentView: View {
                         }
                     Text("Last card scanned: \(lastCardNumber)")
                     GeometryReader { cell in
-//                            HStack {
-//                                Text("State").font(.system(size: 26))
-//                                    .foregroundStyle(.gray)
-//                                    .frame(width: cell.size.width * 0.2)
-//                                Text("Lot").font(.system(size: 26))
-//                                    .foregroundStyle(.gray)
-//                                    .frame(width: cell.size.width * 0.4)
-//                                Text("Bay Number").font(.system(size: 26))
-//                                    .foregroundStyle(.gray)
-//                                    .frame(width: cell.size.width * 0.4)
-//                            }.frame(height: cell.size.height * 0.1)
                         HStack {
                             Text("\(checkedIn ? "Out" : "In")").font(.system(size: 26))
                                 .frame(width: cell.size.width * 0.2)
@@ -84,24 +84,18 @@ struct ContentView: View {
                                 .frame(width: cell.size.width * 0.4)
                             Text("\(value: occupiedSlot?.bayNumber ?? 0)").font(.system(size: 96))
                                 .frame(width: cell.size.width * 0.4)
-                        }.frame(height: cell.size.height * 0.9)
+                        }
+                        .frame(height: cell.size.height * 0.9)
+                        .fixedSize()
+                        .frame(maxWidth: .infinity)
+                        .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill((checkedIn ? Color.red : Color.green).opacity(0.50)))
                         Spacer()
                     }
                 }.padding(100)
                 Spacer()
                 HStack {
-                    Text("Total Checkins: \(value: 3122)")
+                    Text("Current Checkins: \(value: parkingSlots.count)")
                     Spacer()
-                    NavigationLink {
-                        EditParkedItem(oldSlot: parkingSlots[parkingSlots.count - 1])
-                    } label: {
-                        Text(Image(systemName: "pencil"))
-                    }
-                    NavigationLink {
-                        SettingsView()
-                    } label: {
-                        Text(Image(systemName: "gearshape.fill"))
-                    }
                 }.padding(100)
             }
         }

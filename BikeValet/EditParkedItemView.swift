@@ -58,7 +58,7 @@ struct EditParkedItem: View {
                             ForEach(0 ..< parkingLots.count, id: \.self) {
                                 Text(parkingLots[$0].lotName)
                             }
-                        }.frame(width: 120.0, alignment: .trailing).labelsHidden().background(.green)
+                        }.frame(width: 120.0, alignment: .trailing).labelsHidden()
                     }
                     HStack {
                         Text("Bay:").font(.system(size: 26))
