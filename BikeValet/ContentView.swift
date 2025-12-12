@@ -17,8 +17,6 @@ struct ContentView: View {
     @State private var cardNumber: String = ""
     @State private var lastCardNumber: String = ""
     @State private var checkedIn: Bool = false
-    @State private var editItemPressed = false
-    @State private var settingsPressed = false
     @FocusState private var focusConfirm: Bool
     @State private var occupiedSlot: ParkingSlot? = nil
 
@@ -28,8 +26,6 @@ struct ContentView: View {
                 HStack {
                     Text("Current Checkins: \(value: parkingSlots.count)")
                     Spacer()
-                    Button("", systemImage: "gearshape.fill", action: {
-                    })
                 }.padding(100)
                 Spacer()
                 HStack {
@@ -56,7 +52,8 @@ struct ContentView: View {
                             } else {
                                 checkedIn = false
                                 occupiedSlot = ParkingSlot(badgeId: cardNumber, lot: parkingLots[selectedLotId])
-                                modelContext.insert(occupiedSlot!)
+                                parkingLots[selectedLotId].slots.append(occupiedSlot!)
+                                //modelContext.insert(occupiedSlot!)
                                 do {
                                     try modelContext.save()
                                 } catch {
@@ -95,20 +92,19 @@ struct ContentView: View {
                 HStack {
                     Text("Total Checkins: \(value: 3122)")
                     Spacer()
-                    Button("", systemImage: "pencil", action: {
-                        editItemPressed.toggle()
-                    })
-                    Button("", systemImage: "gearshape.fill", action: {
-                        settingsPressed.toggle()
-                    })
+                    NavigationLink {
+                        EditParkedItem(oldSlot: parkingSlots[parkingSlots.count - 1])
+                    } label: {
+                        Text(Image(systemName: "pencil"))
+                    }
+                    NavigationLink {
+                        SettingsView()
+                    } label: {
+                        Text(Image(systemName: "gearshape.fill"))
+                    }
                 }.padding(100)
             }
-        }.sheet(isPresented: $editItemPressed, content: {
-            EditParkedItem(oldSlot: parkingSlots[parkingSlots.count - 1])
-        })
-        .sheet(isPresented: $settingsPressed, content: {
-            SettingsView()
-        })
+        }
     }
 }
 

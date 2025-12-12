@@ -26,9 +26,9 @@ struct SettingsView: View {
                                 Text(slot.lot.lotName)
                                 Text(slot.badgeId)
                                 Text("\(value: slot.bayNumber)")
-                                Button("Edit", systemImage: "pencil", action: {
-                                    //EditParkedItem()
-                                })
+                                NavigationLink(destination: EditParkedItem(oldSlot: slot)) {
+                                    Text("Edit")
+                                }
                             }
                         }
                     } else {
@@ -37,9 +37,11 @@ struct SettingsView: View {
                                 Text(slot.lot.lotName)
                                 Text(slot.badgeId)
                                 Text("\(value: slot.bayNumber)")
-                                Button("Edit", systemImage: "pencil", action: {
-                                    //EditParkedItem()
-                                })
+                                NavigationLink {
+                                    EditParkedItem(oldSlot: slot)
+                                } label: {
+                                    Text(Image(systemName: "pencil"))
+                                }
                             }
                         }
                     }

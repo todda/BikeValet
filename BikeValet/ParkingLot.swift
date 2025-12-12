@@ -28,10 +28,10 @@ final class ParkingSlot {
     var badgeId: String
     var bayNumber: Int
 
-    init(badgeId: String, lot: ParkingLot) {
+    init(badgeId: String, bayNumber: Int = 0, lot: ParkingLot) {
         self.timestamp = Date.now
         self.lot = lot
-        self.bayNumber = lot.slots.count + 1
+        self.bayNumber = (bayNumber == 0) ? lot.slots.count + 1 : bayNumber
         self.badgeId = badgeId
     }
 }

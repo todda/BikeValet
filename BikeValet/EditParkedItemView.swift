@@ -89,7 +89,13 @@ struct EditParkedItem: View {
 
                 Spacer()
                 Button("Save") {
-                    let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, lot: parkingLots[selectedLot])
+                    let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[selectedLot])
+                    oldSlot.lot.slots.remove(at: oldSlot.lot.slots.firstIndex(of: oldSlot)!)
+                    if (newSlot.bayNumber < parkingLots[selectedLot].slots.count) {
+                        parkingLots[selectedLot].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
+                    } else {
+                        parkingLots[selectedLot].slots.append(newSlot)
+                    }
                     modelContext.delete(oldSlot)
                     modelContext.insert(newSlot)
                     do {
