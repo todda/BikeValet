@@ -37,67 +37,72 @@ struct ContentView: View {
                     } label: {
                         Text("Edit Last")
                     }
-                }.padding(100)
+                }.padding(16)
                 Spacer()
-                VStack {
-                    HStack {
-                        Picker(selection: $selectedLotId, label: Text("Current Lot:")) {
-                            ForEach(0 ..< parkingLots.count, id: \.self) {
-                                Text(parkingLots[$0].lotName)
-                            }
-                        }.pickerStyle(.segmented)
-                    }.padding(10)
-                    TextField("Waiting for card scan", text: $cardNumber)
-                        .focused($focusConfirm)
-                        .textSelection(.disabled)
-                        .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill(.accent))
-                        .font(.system(size: 26))
-                        .onAppear() {
-                            focusConfirm = true
+                HStack {
+                    Picker(selection: $selectedLotId, label: Text("Current Lot:")) {
+                        ForEach(0 ..< parkingLots.count, id: \.self) {
+                            Text(parkingLots[$0].lotName)
                         }
-                        .multilineTextAlignment(.center).onSubmit {
-                            occupiedSlot = parkingSlots.first(where: { $0.badgeId == cardNumber })
-                            if ((occupiedSlot) != nil) {
-                                checkedIn = true
-                                modelContext.delete(occupiedSlot!)
-                            } else {
-                                checkedIn = false
-                                occupiedSlot = ParkingSlot(badgeId: cardNumber, lot: parkingLots[selectedLotId])
-                                parkingLots[selectedLotId].slots.append(occupiedSlot!)
-                                //modelContext.insert(occupiedSlot!)
-                                do {
-                                    try modelContext.save()
-                                } catch {
-                                    print ("oh no")
-                                }
-                            }
-                            lastCardNumber = cardNumber
-                            cardNumber = ""
-                            focusConfirm = true
-                        }
-                    Text("Last card scanned: \(lastCardNumber)")
-                    GeometryReader { cell in
-                        HStack {
-                            Text("\(checkedIn ? "Out" : "In")").font(.system(size: 26))
-                                .frame(width: cell.size.width * 0.2)
-                            Text("\(occupiedSlot?.lot.lotName ?? "Unknown Lot")").font(.system(size: 26))
-                                .frame(width: cell.size.width * 0.4)
-                            Text("\(value: occupiedSlot?.bayNumber ?? 0)").font(.system(size: 96))
-                                .frame(width: cell.size.width * 0.4)
-                        }
-                        .frame(height: cell.size.height * 0.9)
-                        .fixedSize()
-                        .frame(maxWidth: .infinity)
-                        .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill((checkedIn ? Color.red : Color.green).opacity(0.50)))
-                        Spacer()
+                    }.pickerStyle(.segmented)
+                }.padding(10)
+
+                TextField("Waiting for card scan", text: $cardNumber)
+                    .font(.system(size: 26))
+                    .focused($focusConfirm)
+                    .textSelection(.disabled)
+                    .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill(.accent))
+                    .multilineTextAlignment(.center)
+                    .keyboardType(.numbersAndPunctuation)
+                    .onAppear() {
+                        focusConfirm = true
                     }
-                }.padding(100)
+                    .onSubmit {
+                        occupiedSlot = parkingSlots.first(where: { $0.badgeId == cardNumber })
+                        if ((occupiedSlot) != nil) {
+                            checkedIn = true
+                            //occupiedSlot!.lot.slots.remove(at: occupiedSlot!.bayNumber)
+                            occupiedSlot!.lot.slots.removeAll(where: { $0.bayNumber == occupiedSlot!.bayNumber })
+                            modelContext.delete(occupiedSlot!)
+                        } else {
+                            checkedIn = false
+                            occupiedSlot = ParkingSlot(badgeId: cardNumber, lot: parkingLots[selectedLotId])
+                            parkingLots[selectedLotId].slots.append(occupiedSlot!)
+                            //modelContext.insert(occupiedSlot!)
+                            do {
+                                try modelContext.save()
+                            } catch {
+                                print ("oh no")
+                            }
+                        }
+                        lastCardNumber = cardNumber
+                        cardNumber = ""
+                        focusConfirm = true
+                        selectedLotId = 0
+                    }
+
+                Text("Last card scanned: \(lastCardNumber)")
+
+                HStack {
+                    Text("\(checkedIn ? "Out" : "In")").font(.system(size: 26))
+                        .frame(width: UIScreen.main.bounds.size.width * 0.2)
+                    Text("\(occupiedSlot?.lot.lotName ?? "Unknown Lot")").font(.system(size: 26))
+                        .frame(width: UIScreen.main.bounds.size.width * 0.4)
+                    Text("\(value: occupiedSlot?.bayNumber ?? 0)").font(.system(size: 106))
+                        .frame(width: UIScreen.main.bounds.size.width * 0.2)
+                }
+                .frame(height: UIScreen.main.bounds.size.height * 0.3)
+                .fixedSize()
+                .frame(maxWidth: .infinity)
+                .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill((checkedIn ? Color.accentColor : Color.green).opacity(0.50)))
+
                 Spacer()
+
                 HStack {
                     Text("Current Checkins: \(value: parkingSlots.count)")
                     Spacer()
-                }.padding(100)
-            }
+                }.padding(16)
+            }.padding(16)
         }
     }
 }

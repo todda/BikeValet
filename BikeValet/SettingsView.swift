@@ -67,7 +67,7 @@ struct SettingsView: View {
                     }
                 }.padding(20)
             }
-            }.searchable(text: $slotSearchNumber, prompt: "Find by parking slot number").keyboardType(.numberPad)
+            }.searchable(text: $slotSearchNumber, prompt: "Find by parking slot number")
     }
 }
 

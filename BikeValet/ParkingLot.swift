@@ -14,6 +14,28 @@ final class ParkingLot {
     var lotName: String
     var slots: [ParkingSlot]
 
+    func highestOccupiedSlot() -> Int {
+        var returnBayNumber = 0
+
+        for i in 0..<slots.count {
+            if slots[i].bayNumber > returnBayNumber {
+                returnBayNumber = slots[i].bayNumber
+            }
+        }
+        return returnBayNumber
+    }
+
+    func nextBestOccupiedSlot() -> Int {
+        var bestBayNumber = 1
+
+        for _ in 0..<slots.count {
+            if slots.contains(where: { $0.bayNumber == bestBayNumber}) {
+                bestBayNumber = bestBayNumber + 1
+            }
+        }
+        return bestBayNumber
+    }
+
     init(name: String, slots: [ParkingSlot] = []) {
         self.lotName = name
         self.slots = slots
@@ -31,7 +53,8 @@ final class ParkingSlot {
     init(badgeId: String, bayNumber: Int = 0, lot: ParkingLot) {
         self.timestamp = Date.now
         self.lot = lot
-        self.bayNumber = (bayNumber == 0) ? lot.slots.count + 1 : bayNumber
+        self.bayNumber = (bayNumber == 0) ? lot.highestOccupiedSlot() + 1 : bayNumber
+//        self.bayNumber = (bayNumber == 0) ? lot.nextBestOccupiedSlot() : bayNumber
         self.badgeId = badgeId
     }
 }

@@ -63,15 +63,18 @@ struct EditParkedItem: View {
                     HStack {
                         Text("Bay:").font(.system(size: 26))
                         Spacer()
-                        TextField("new bay", text: $newBayNumber).font(.system(size: 26)).multilineTextAlignment(.center)
-                        .onSubmit {
-                            // check if slot is valid
-                            if (parkingSlots.contains(where: {$0.bayNumber == Int(newBayNumber)})) {
-                                isShowingErrorMessage = true
-                            } else {
-                                isShowingErrorMessage = false
+                        TextField("new bay", text: $newBayNumber)
+                            .font(.system(size: 26))
+                            .multilineTextAlignment(.center)
+                            .keyboardType(.numberPad)
+                            .onSubmit {
+                                // check if slot is valid
+                                if (parkingSlots.contains(where: {$0.bayNumber == Int(newBayNumber)})) {
+                                    isShowingErrorMessage = true
+                                } else {
+                                    isShowingErrorMessage = false
+                                }
                             }
-                        }
                     }
                 }.frame(height: 200)
                 .fixedSize()
@@ -88,24 +91,33 @@ struct EditParkedItem: View {
                 }
 
                 Spacer()
-                Button("Save") {
-                    let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[selectedLot])
-                    oldSlot.lot.slots.remove(at: oldSlot.lot.slots.firstIndex(of: oldSlot)!)
-                    if (newSlot.bayNumber < parkingLots[selectedLot].slots.count) {
-                        parkingLots[selectedLot].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
-                    } else {
-                        parkingLots[selectedLot].slots.append(newSlot)
+                HStack {
+                    Spacer()
+                    Button("Save") {
+                        let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[selectedLot])
+                        oldSlot.lot.slots.remove(at: oldSlot.lot.slots.firstIndex(of: oldSlot)!)
+                        if (newSlot.bayNumber < parkingLots[selectedLot].slots.count) {
+                            parkingLots[selectedLot].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
+                        } else {
+                            if (newSlot.bayNumber > parkingLots[selectedLot].slots.count) {
+                                // TODO: custom error message variable?
+                                isShowingErrorMessage = true
+                            } else {
+                                parkingLots[selectedLot].slots.append(newSlot)
+                            }
+                        }
+                        modelContext.delete(oldSlot)
+                        modelContext.insert(newSlot)
+                        do {
+                            try modelContext.save()
+                        } catch {
+                            print ("oh no")
+                        }
+                        dismiss()
                     }
-                    modelContext.delete(oldSlot)
-                    modelContext.insert(newSlot)
-                    do {
-                        try modelContext.save()
-                    } catch {
-                        print ("oh no")
-                    }
-                    dismiss()
+                    Spacer()
                 }
-            }
+            }.padding(16)
         }.frame(minWidth: 400, minHeight: 600).padding(16)
     }
 }

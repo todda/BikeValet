@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-1024x1024.png",
+      "filename" : "bike-valet-1024.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -29,61 +29,61 @@
       "size" : "1024x1024"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-16x16.png",
+      "filename" : "bike-valet-16.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-32x32 1.png",
+      "filename" : "bike-valet-32 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "16x16"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-32x32.png",
+      "filename" : "bike-valet-32.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "32x32"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-64x64.png",
+      "filename" : "bike-valet-64.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-128x128.png",
+      "filename" : "bike-valet-128.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "128x128"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-256x256 1.png",
+      "filename" : "bike-valet-256.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-256x256.png",
+      "filename" : "bike-valet-256 1.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "256x256"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-512x512 1.png",
+      "filename" : "bike-valet-512.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-512x512.png",
+      "filename" : "bike-valet-512 1.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
-      "filename" : "BIKELOUD-MARK-2023-Gold-2160-1024x1024 1.png",
+      "filename" : "bike-valet-1024 1.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"
