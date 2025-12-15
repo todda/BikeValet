@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "bike-valet-1024.png",
+      "filename" : "bike-valet-1024 1.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -29,61 +29,61 @@
       "size" : "1024x1024"
     },
     {
-      "filename" : "bike-valet-16.png",
+      "filename" : "bike-valet-1024_16.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"
     },
     {
-      "filename" : "bike-valet-32 1.png",
+      "filename" : "bike-valet-1024_32.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "16x16"
     },
     {
-      "filename" : "bike-valet-32.png",
+      "filename" : "bike-valet-1024_32 1.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "32x32"
     },
     {
-      "filename" : "bike-valet-64.png",
+      "filename" : "bike-valet-1024_64.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "32x32"
     },
     {
-      "filename" : "bike-valet-128.png",
+      "filename" : "bike-valet-1024_128.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "128x128"
     },
     {
-      "filename" : "bike-valet-256.png",
+      "filename" : "bike-valet-1024_256.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "128x128"
     },
     {
-      "filename" : "bike-valet-256 1.png",
+      "filename" : "bike-valet-1024_256 1.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "256x256"
     },
     {
-      "filename" : "bike-valet-512.png",
+      "filename" : "bike-valet-1024_512.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "256x256"
     },
     {
-      "filename" : "bike-valet-512 1.png",
+      "filename" : "bike-valet-1024_512 1.png",
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "512x512"
     },
     {
-      "filename" : "bike-valet-1024 1.png",
+      "filename" : "bike-valet-1024_1024.png",
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"
