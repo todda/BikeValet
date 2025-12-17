@@ -24,10 +24,14 @@ struct SettingsView: View {
                         ForEach(parkingSlots) { slot in
                             HStack {
                                 Text(slot.lot.lotName)
-                                Text(slot.badgeId)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        Spacer()
+                                        Text(slot.badgeId)
+                                    }.containerRelativeFrame(.horizontal, alignment: .trailing)
+                                }
                                 Text("\(value: slot.bayNumber)")
                                 NavigationLink(destination: EditParkedItem(oldSlot: slot)) {
-                                    Text("Edit")
                                 }
                             }
                         }
@@ -35,12 +39,14 @@ struct SettingsView: View {
                         ForEach(parkingSlots.filter { slot in slot.bayNumber == Int(slotSearchNumber)}) { slot in
                             HStack {
                                 Text(slot.lot.lotName)
-                                Text(slot.badgeId)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        Spacer()
+                                        Text(slot.badgeId)
+                                    }.containerRelativeFrame(.horizontal, alignment: .trailing)
+                                }
                                 Text("\(value: slot.bayNumber)")
-                                NavigationLink {
-                                    EditParkedItem(oldSlot: slot)
-                                } label: {
-                                    Text(Image(systemName: "pencil"))
+                                NavigationLink(destination: EditParkedItem(oldSlot: slot))  {
                                 }
                             }
                         }

@@ -53,7 +53,6 @@ struct ContentView: View {
                     .textSelection(.disabled)
                     .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill(.accent))
                     .multilineTextAlignment(.center)
-                    .keyboardType(.numbersAndPunctuation)
                     .onAppear() {
                         focusConfirm = true
                     }

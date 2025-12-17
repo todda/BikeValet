@@ -21,12 +21,17 @@ struct EditParkedItem: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
-                Text("From:").font(.system(size: 26)).frame(alignment: .leading)
+                Text("From:").font(.system(size: 26))
                 VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         Text("ID:").font(.system(size: 26))
                         Spacer()
-                        Text("\(oldSlot.badgeId)").font(.system(size: 26))
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                Spacer()
+                                Text("\(oldSlot.badgeId)").font(.system(size: 26))
+                            }.containerRelativeFrame(.horizontal, alignment: .trailing)
+                        }
                     }
                     HStack {
                         Text("Lot:").font(.system(size: 26))
@@ -39,9 +44,8 @@ struct EditParkedItem: View {
                         Text("\(value: oldSlot.bayNumber)").font(.system(size: 26))
                     }
                 }
-                .frame(height: 200)
-                .fixedSize()
-                .frame(maxWidth: .infinity)
+                .padding(20)
+                .frame(height: 180)
                 .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill(Color.gray.opacity(0.10)))
 
                 Text("To:").font(.system(size: 26))
@@ -49,7 +53,12 @@ struct EditParkedItem: View {
                     HStack {
                         Text("ID:").font(.system(size: 26))
                         Spacer()
-                        Text("\(oldSlot.badgeId)").font(.system(size: 26))
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                Spacer()
+                                Text("\(oldSlot.badgeId)").font(.system(size: 26))
+                            }.containerRelativeFrame(.horizontal, alignment: .trailing)
+                        }
                     }
                     HStack {
                         Text("Lot:").font(.system(size: 26))
@@ -65,8 +74,7 @@ struct EditParkedItem: View {
                         Spacer()
                         TextField("new bay", text: $newBayNumber)
                             .font(.system(size: 26))
-                            .multilineTextAlignment(.center)
-                            .keyboardType(.numberPad)
+                            .multilineTextAlignment(.trailing)
                             .onSubmit {
                                 // check if slot is valid
                                 if (parkingSlots.contains(where: {$0.bayNumber == Int(newBayNumber)})) {
@@ -76,18 +84,20 @@ struct EditParkedItem: View {
                                 }
                             }
                     }
-                }.frame(height: 200)
-                .fixedSize()
-                .frame(maxWidth: .infinity)
+                }
+                .padding(20)
+                .frame(height: 180)
                 .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill(Color.blue.opacity(0.20)))
 
                 if (isShowingErrorMessage) {
                     VStack(alignment: .leading, spacing: 10) {
                         Text("Error: that slot is currently not available").font(.system(size: 26)).accentColor(.red)
-                    }.frame(height: 200)
-                        .fixedSize()
-                        .frame(maxWidth: .infinity)
-                        .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill(Color.red.opacity(0.50)))
+                    }
+                    .padding(20)
+                    .frame(height: 160)
+                    .frame(maxWidth: .infinity)
+                    .background(RoundedRectangle(cornerRadius: 50, style: .continuous)
+                    .fill(Color.red.opacity(0.50)))
                 }
 
                 Spacer()
@@ -95,25 +105,25 @@ struct EditParkedItem: View {
                     Spacer()
                     Button("Save") {
                         let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[selectedLot])
-                        oldSlot.lot.slots.remove(at: oldSlot.lot.slots.firstIndex(of: oldSlot)!)
-                        if (newSlot.bayNumber < parkingLots[selectedLot].slots.count) {
-                            parkingLots[selectedLot].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
+                        oldSlot.lot.slots.removeAll(where: { $0.badgeId == oldSlot.badgeId })
+                        if (newSlot.bayNumber > (parkingLots[selectedLot].slots.count + 1)) {
+                            // TODO: custom error message variable?
+                            isShowingErrorMessage = true
                         } else {
-                            if (newSlot.bayNumber > parkingLots[selectedLot].slots.count) {
-                                // TODO: custom error message variable?
-                                isShowingErrorMessage = true
+                            if (newSlot.bayNumber < parkingLots[selectedLot].slots.count) {
+                                parkingLots[selectedLot].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
                             } else {
                                 parkingLots[selectedLot].slots.append(newSlot)
                             }
+                            modelContext.delete(oldSlot)
+                            modelContext.insert(newSlot)
+                            do {
+                                try modelContext.save()
+                            } catch {
+                                print ("oh no")
+                            }
+                            dismiss()
                         }
-                        modelContext.delete(oldSlot)
-                        modelContext.insert(newSlot)
-                        do {
-                            try modelContext.save()
-                        } catch {
-                            print ("oh no")
-                        }
-                        dismiss()
                     }
                     Spacer()
                 }
@@ -123,5 +133,5 @@ struct EditParkedItem: View {
 }
 
 #Preview {
-    EditParkedItem(oldSlot: ParkingSlot(badgeId: "12345", lot: ParkingLot(name: "main")))
+    EditParkedItem(oldSlot: ParkingSlot(badgeId: "12345123451234512345", lot: ParkingLot(name: "main")))
 }
