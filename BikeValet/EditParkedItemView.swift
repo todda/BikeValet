@@ -102,6 +102,16 @@ struct EditParkedItem: View {
 
                 Spacer()
                 HStack {
+                    Button("Remove") {
+                        oldSlot.lot.slots.removeAll(where: { $0.badgeId == oldSlot.badgeId })
+                        modelContext.delete(oldSlot)
+                        do {
+                            try modelContext.save()
+                        } catch {
+                            print ("oh no")
+                        }
+                        dismiss()
+                    }
                     Spacer()
                     Button("Save") {
                         let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[selectedLot])
@@ -125,8 +135,7 @@ struct EditParkedItem: View {
                             dismiss()
                         }
                     }
-                    Spacer()
-                }
+                }.padding(16)
             }.padding(16)
         }.frame(minWidth: 400, minHeight: 600).padding(16)
     }

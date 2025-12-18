@@ -14,7 +14,9 @@ struct SettingsView: View {
     @Environment(\.dismiss) var dismiss
     @Query private var parkingSlots: [ParkingSlot]
     @State private var isPresentingAlert: Bool = false
+    @State private var isPresentingAddLot: Bool = false
     @State var slotSearchNumber = ""
+    @State var newLotName = ""
 
     var body: some View {
         NavigationStack {
@@ -68,8 +70,20 @@ struct SettingsView: View {
                       }
                     }
                     Spacer()
-                    Button("Add another lot") {
-                        dismiss()
+                    Button("Add another lot", systemImage: "document.badge.plus.fill", action: {
+                        isPresentingAddLot = true
+                    }).accentColor(.red)
+                    .alert("What is the name of the new lot", isPresented: $isPresentingAddLot) {
+                        TextField("New lot name", text: $newLotName)
+                        Button("Add") {
+                            modelContext.insert(ParkingLot(name: newLotName))
+                            do {
+                                try modelContext.save()
+                                dismiss()
+                            } catch {
+                                print("Failed to delete all.")
+                            }
+                        }
                     }
                 }.padding(20)
             }
