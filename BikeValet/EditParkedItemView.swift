@@ -11,9 +11,9 @@ import SwiftData
 struct EditParkedItem: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @Query private var parkingSlots: [ParkingSlot]
+    @Query private var parkingSlots: [CombinedZoneParkingSlot]
     @Query private var parkingLots: [ParkingLot]
-    @State var oldSlot: ParkingSlot
+    @State var oldSlot: CombinedZoneParkingSlot
     @State var newBayNumber = ""
     @State var selectedLot = 0
     @State var isShowingErrorMessage = false
@@ -75,9 +75,10 @@ struct EditParkedItem: View {
                         TextField("new bay", text: $newBayNumber)
                             .font(.system(size: 26))
                             .multilineTextAlignment(.trailing)
+                            .onAppear() { newBayNumber = "\(oldSlot.bayNumber)" }
                             .onSubmit {
                                 // check if slot is valid
-                                if (parkingSlots.contains(where: {$0.bayNumber == Int(newBayNumber)})) {
+                                if (parkingSlots.contains(where: {$0.bayNumber == Int(newBayNumber) && $0.lot.lotName == oldSlot.zoneName})) {
                                     isShowingErrorMessage = true
                                 } else {
                                     isShowingErrorMessage = false
@@ -114,16 +115,17 @@ struct EditParkedItem: View {
                     }
                     Spacer()
                     Button("Save") {
-                        let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[selectedLot])
+//                        let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[selectedLot])
+                        let newSlot = CombinedZoneParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[0], zone:parkingLots[selectedLot].lotName)
                         oldSlot.lot.slots.removeAll(where: { $0.badgeId == oldSlot.badgeId })
-                        if (newSlot.bayNumber > (parkingLots[selectedLot].slots.count + 1)) {
+                        if (newSlot.bayNumber > (parkingLots[0].slots.count + 1)) {
                             // TODO: custom error message variable?
                             isShowingErrorMessage = true
                         } else {
                             if (newSlot.bayNumber < parkingLots[selectedLot].slots.count) {
-                                parkingLots[selectedLot].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
+                                parkingLots[0].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
                             } else {
-                                parkingLots[selectedLot].slots.append(newSlot)
+                                parkingLots[0].slots.append(newSlot)
                             }
                             modelContext.delete(oldSlot)
                             modelContext.insert(newSlot)
@@ -142,5 +144,6 @@ struct EditParkedItem: View {
 }
 
 #Preview {
-    EditParkedItem(oldSlot: ParkingSlot(badgeId: "12345123451234512345", lot: ParkingLot(name: "main")))
+//    EditParkedItem(oldSlot: ParkingSlot(badgeId: "12345123451234512345", lot: ParkingLot(name: "main")))
+    EditParkedItem(oldSlot: CombinedZoneParkingSlot(badgeId: "12345123451234512345", lot: ParkingLot(name: "main")))
 }

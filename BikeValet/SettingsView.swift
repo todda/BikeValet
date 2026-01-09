@@ -12,20 +12,23 @@ internal import Combine
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) var dismiss
-    @Query private var parkingSlots: [ParkingSlot]
+    @Query private var parkingSlots: [CombinedZoneParkingSlot]
     @State private var isPresentingAlert: Bool = false
     @State private var isPresentingAddLot: Bool = false
     @State var slotSearchNumber = ""
     @State var newLotName = ""
+    let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+    let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
     var body: some View {
         NavigationStack {
             VStack {
+                Text("App Version: \(appVersion ?? "0.0.0") build \(buildNumber ?? "0")")
                 List {
                     if slotSearchNumber.isEmpty {
                         ForEach(parkingSlots) { slot in
                             HStack {
-                                Text(slot.lot.lotName)
+                                Text(slot.zoneName)
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
                                         Spacer()
@@ -40,7 +43,7 @@ struct SettingsView: View {
                     } else {
                         ForEach(parkingSlots.filter { slot in slot.bayNumber == Int(slotSearchNumber)}) { slot in
                             HStack {
-                                Text(slot.lot.lotName)
+                                Text(slot.zoneName)
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
                                         Spacer()
@@ -62,7 +65,8 @@ struct SettingsView: View {
                         isPresented: $isPresentingAlert) {
                         Button("Yes, delete all", role: .destructive) {
                             do {
-                                try modelContext.delete(model: ParkingSlot.self)
+//                                try modelContext.delete(model: ParkingSlot.self)
+                                try modelContext.delete(model: CombinedZoneParkingSlot.self)
                                 dismiss()
                             } catch {
                                 print("Failed to delete all.")

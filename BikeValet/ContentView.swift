@@ -11,14 +11,14 @@ import SwiftData
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var parkingLots: [ParkingLot]
-    @Query private var parkingSlots: [ParkingSlot]
+    @Query private var parkingSlots: [CombinedZoneParkingSlot]
 
     @State private var selectedLotId: Int = 0
     @State private var cardNumber: String = ""
     @State private var lastCardNumber: String = ""
     @State private var checkedIn: Bool = false
     @FocusState private var focusConfirm: Bool
-    @State private var occupiedSlot: ParkingSlot? = nil
+    @State private var occupiedSlot: CombinedZoneParkingSlot? = nil
 
     var body: some View {
         NavigationStack {
@@ -61,12 +61,13 @@ struct ContentView: View {
                         if ((occupiedSlot) != nil) {
                             checkedIn = true
                             //occupiedSlot!.lot.slots.remove(at: occupiedSlot!.bayNumber)
-                            occupiedSlot!.lot.slots.removeAll(where: { $0.bayNumber == occupiedSlot!.bayNumber })
-                            modelContext.delete(occupiedSlot!)
+                            //occupiedSlot!.lot.slots.removeAll(where: { $0.bayNumber == occupiedSlot!.bayNumber })
+                            //modelContext.delete(occupiedSlot!)
                         } else {
                             checkedIn = false
-                            occupiedSlot = ParkingSlot(badgeId: cardNumber, lot: parkingLots[selectedLotId])
-                            parkingLots[selectedLotId].slots.append(occupiedSlot!)
+//                            occupiedSlot = ParkingSlot(badgeId: cardNumber, lot: parkingLots[selectedLotId])
+                            occupiedSlot = CombinedZoneParkingSlot(badgeId: cardNumber, lot: parkingLots[0], zone: parkingLots[selectedLotId].lotName)
+                            parkingLots[0].slots.append(occupiedSlot!)
                             //modelContext.insert(occupiedSlot!)
                             do {
                                 try modelContext.save()
@@ -85,7 +86,7 @@ struct ContentView: View {
                 HStack {
                     Text("\(checkedIn ? "Out" : "In")").font(.system(size: 26))
                         .frame(width: UIScreen.main.bounds.size.width * 0.2)
-                    Text("\(occupiedSlot?.lot.lotName ?? "Unknown Lot")").font(.system(size: 26))
+                    Text("\(occupiedSlot?.zoneName ?? "Unknown Lot")").font(.system(size: 26))
                         .frame(width: UIScreen.main.bounds.size.width * 0.4)
                     Text("\(value: occupiedSlot?.bayNumber ?? 0)").font(.system(size: 106))
                         .frame(width: UIScreen.main.bounds.size.width * 0.2)

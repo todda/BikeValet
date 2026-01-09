@@ -10,9 +10,9 @@ import SwiftData
 
 @Model
 final class ParkingLot {
-    @Relationship(deleteRule: .cascade, inverse: \ParkingSlot.lot)
+    @Relationship(deleteRule: .cascade, inverse: \CombinedZoneParkingSlot.lot)
     var lotName: String
-    var slots: [ParkingSlot]
+    var slots: [CombinedZoneParkingSlot]
 
     func highestOccupiedSlot() -> Int {
         var returnBayNumber = 0
@@ -36,9 +36,30 @@ final class ParkingLot {
         return bestBayNumber
     }
 
-    init(name: String, slots: [ParkingSlot] = []) {
+    init(name: String, slots: [CombinedZoneParkingSlot] = []) {
         self.lotName = name
         self.slots = slots
+    }
+}
+
+@Model
+final class CombinedZoneParkingSlot {
+    var lot: ParkingLot
+    var zoneName: String
+    var timestamp: Date
+    var badgeId: String
+    var bayNumber: Int
+
+    init(badgeId: String, bayNumber: Int = 0, lot: ParkingLot, zone: String = "") {
+        self.timestamp = Date.now
+        self.lot = lot
+        self.zoneName = zone
+        if (true) {
+            self.bayNumber = (bayNumber == 0) ? lot.highestOccupiedSlot() + 1 : bayNumber
+        } else {
+            self.bayNumber = (bayNumber == 0) ? lot.nextBestOccupiedSlot() : bayNumber
+        }
+        self.badgeId = badgeId
     }
 }
 
@@ -53,8 +74,11 @@ final class ParkingSlot {
     init(badgeId: String, bayNumber: Int = 0, lot: ParkingLot) {
         self.timestamp = Date.now
         self.lot = lot
-        self.bayNumber = (bayNumber == 0) ? lot.highestOccupiedSlot() + 1 : bayNumber
-//        self.bayNumber = (bayNumber == 0) ? lot.nextBestOccupiedSlot() : bayNumber
+        if (true) {
+            self.bayNumber = (bayNumber == 0) ? lot.highestOccupiedSlot() + 1 : bayNumber
+        } else {
+            self.bayNumber = (bayNumber == 0) ? lot.nextBestOccupiedSlot() : bayNumber
+        }
         self.badgeId = badgeId
     }
 }
