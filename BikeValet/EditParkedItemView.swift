@@ -36,7 +36,7 @@ struct EditParkedItem: View {
                     HStack {
                         Text("Lot:").font(.system(size: 26))
                         Spacer()
-                        Text("\(oldSlot.lot.lotName)").font(.system(size: 26))
+                        Text("\(oldSlot.zoneName)").font(.system(size: 26))
                     }
                     HStack {
                         Text("Bay:").font(.system(size: 26))
@@ -115,17 +115,18 @@ struct EditParkedItem: View {
                     }
                     Spacer()
                     Button("Save") {
+                        let mainLot = parkingLots.firstIndex(where: { $0.slots.count > 0 })!
 //                        let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[selectedLot])
-                        let newSlot = CombinedZoneParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[0], zone:parkingLots[selectedLot].lotName)
+                        let newSlot = CombinedZoneParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[mainLot], zone:parkingLots[selectedLot].lotName)
                         oldSlot.lot.slots.removeAll(where: { $0.badgeId == oldSlot.badgeId })
-                        if (newSlot.bayNumber > (parkingLots[0].slots.count + 1)) {
+                        if (newSlot.bayNumber > (parkingLots[mainLot].slots.count + 1)) {
                             // TODO: custom error message variable?
                             isShowingErrorMessage = true
                         } else {
                             if (newSlot.bayNumber < parkingLots[selectedLot].slots.count) {
-                                parkingLots[0].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
+                                parkingLots[mainLot].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
                             } else {
-                                parkingLots[0].slots.append(newSlot)
+                                parkingLots[mainLot].slots.append(newSlot)
                             }
                             modelContext.delete(oldSlot)
                             modelContext.insert(newSlot)

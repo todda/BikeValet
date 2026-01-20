@@ -12,50 +12,64 @@ internal import Combine
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) var dismiss
-    @Query private var parkingSlots: [CombinedZoneParkingSlot]
+    @Query private var parkingLots: [ParkingLot]
     @State private var isPresentingAlert: Bool = false
     @State private var isPresentingAddLot: Bool = false
+    @State private var isPresentingEditLot: Bool = false
     @State var slotSearchNumber = ""
     @State var newLotName = ""
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
     var body: some View {
+        let mainLot = parkingLots.firstIndex(where: { ($0.slots.count > 0 || $0.lotName == "Main") })!
+
         NavigationStack {
             VStack {
                 Text("App Version: \(appVersion ?? "0.0.0") build \(buildNumber ?? "0")")
-                List {
-                    if slotSearchNumber.isEmpty {
-                        ForEach(parkingSlots) { slot in
-                            HStack {
-                                Text(slot.zoneName)
-                                ScrollView(.horizontal, showsIndicators: false) {
+                ForEach(parkingLots) { lot in
+                    List {
+                        Section(content: {
+                            if slotSearchNumber.isEmpty {
+                                ForEach(parkingLots[mainLot].slots.filter { slot in slot.zoneName == lot.lotName }) { slot in
                                     HStack {
-                                        Spacer()
-                                        Text(slot.badgeId)
-                                    }.containerRelativeFrame(.horizontal, alignment: .trailing)
+                                        Text(slot.zoneName)
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack {
+                                                Spacer()
+                                                Text(slot.badgeId)
+                                            }.containerRelativeFrame(.horizontal, alignment: .trailing)
+                                        }
+                                        Text("\(value: slot.bayNumber)")
+                                        NavigationLink(destination: EditParkedItem(oldSlot: slot)) {
+                                        }
+                                    }
                                 }
-                                Text("\(value: slot.bayNumber)")
-                                NavigationLink(destination: EditParkedItem(oldSlot: slot)) {
+                            } else {
+                                ForEach(parkingLots[mainLot].slots.filter { slot in slot.bayNumber == Int(slotSearchNumber)}) { slot in
+                                    HStack {
+                                        Text(slot.zoneName)
+                                        ScrollView(.horizontal, showsIndicators: false) {
+                                            HStack {
+                                                Spacer()
+                                                Text(slot.badgeId)
+                                            }.containerRelativeFrame(.horizontal, alignment: .trailing)
+                                        }
+                                        Text("\(value: slot.bayNumber)")
+                                        NavigationLink(destination: EditParkedItem(oldSlot: slot))  {
+                                        }
+                                    }
                                 }
                             }
-                        }
-                    } else {
-                        ForEach(parkingSlots.filter { slot in slot.bayNumber == Int(slotSearchNumber)}) { slot in
+                        }, header: {
                             HStack {
-                                Text(slot.zoneName)
-                                ScrollView(.horizontal, showsIndicators: false) {
-                                    HStack {
-                                        Spacer()
-                                        Text(slot.badgeId)
-                                    }.containerRelativeFrame(.horizontal, alignment: .trailing)
-                                }
-                                Text("\(value: slot.bayNumber)")
-                                NavigationLink(destination: EditParkedItem(oldSlot: slot))  {
-                                }
+                                Text("Lot: \(lot.lotName)")
+                                NavigationLink(destination: EditLotName(oldLot: lot), label: {
+                                    Text("Rename")
+                                })
                             }
-                        }
-                    }
+                        })
+                    }.listStyle(.sidebar)
                 }
                 HStack {
                     Button("Delete all", systemImage: "trash.fill", action: {
@@ -91,7 +105,7 @@ struct SettingsView: View {
                     }
                 }.padding(20)
             }
-            }.searchable(text: $slotSearchNumber, prompt: "Find by parking slot number")
+        }.searchable(text: $slotSearchNumber, prompt: "Find by parking slot number")
     }
 }
 

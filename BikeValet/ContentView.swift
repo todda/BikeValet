@@ -21,6 +21,8 @@ struct ContentView: View {
     @State private var occupiedSlot: CombinedZoneParkingSlot? = nil
 
     var body: some View {
+        let mainLot = parkingLots.firstIndex(where: { ($0.slots.count > 0 || $0.lotName == "Main") })!
+
         NavigationStack {
             VStack {
                 HStack {
@@ -66,8 +68,8 @@ struct ContentView: View {
                         } else {
                             checkedIn = false
 //                            occupiedSlot = ParkingSlot(badgeId: cardNumber, lot: parkingLots[selectedLotId])
-                            occupiedSlot = CombinedZoneParkingSlot(badgeId: cardNumber, lot: parkingLots[0], zone: parkingLots[selectedLotId].lotName)
-                            parkingLots[0].slots.append(occupiedSlot!)
+                            occupiedSlot = CombinedZoneParkingSlot(badgeId: cardNumber, lot: parkingLots[mainLot], zone: parkingLots[selectedLotId].lotName)
+                            parkingLots[mainLot].slots.append(occupiedSlot!)
                             //modelContext.insert(occupiedSlot!)
                             do {
                                 try modelContext.save()

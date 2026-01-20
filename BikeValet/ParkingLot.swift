@@ -13,6 +13,7 @@ final class ParkingLot {
     @Relationship(deleteRule: .cascade, inverse: \CombinedZoneParkingSlot.lot)
     var lotName: String
     var slots: [CombinedZoneParkingSlot]
+    var isExpanded: Bool = true
 
     func highestOccupiedSlot() -> Int {
         var returnBayNumber = 0
@@ -23,6 +24,14 @@ final class ParkingLot {
             }
         }
         return returnBayNumber
+    }
+
+    func moveZone(from: String, to: String) -> Void {
+        print("\(slots.count) items in lot")
+        for slot in slots where slot.zoneName == from {
+            print("moving zone from: \(slot.zoneName) to: \(to)")
+            slot.zoneName = to
+        }
     }
 
     func nextBestOccupiedSlot() -> Int {
