@@ -36,11 +36,11 @@ struct EditLotName: View {
                         Text("New Name:").font(.system(size: 26))
                         Spacer()
                         TextField("new bay", text: $newLotName)
+                            .frame(width: 200)
+                            .background(.white)
                             .font(.system(size: 26))
                             .multilineTextAlignment(.trailing)
                             .onAppear() { newLotName = "\(oldLot.lotName)" }
-                            .onSubmit {
-                            }
                     }
                 }
                 .padding(20)

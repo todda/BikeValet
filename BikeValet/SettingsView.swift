@@ -10,6 +10,7 @@ import SwiftData
 internal import Combine
 
 struct SettingsView: View {
+    let MAX_ZONES = 1000
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) var dismiss
     @Query private var parkingLots: [ParkingLot]
@@ -18,6 +19,7 @@ struct SettingsView: View {
     @State private var isPresentingEditLot: Bool = false
     @State var slotSearchNumber = ""
     @State var newLotName = ""
+    @State var selectedLotId: Int = 0
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
@@ -27,50 +29,51 @@ struct SettingsView: View {
         NavigationStack {
             VStack {
                 Text("App Version: \(appVersion ?? "0.0.0") build \(buildNumber ?? "0")")
-                ForEach(parkingLots) { lot in
-                    List {
-                        Section(content: {
-                            if slotSearchNumber.isEmpty {
-                                ForEach(parkingLots[mainLot].slots.filter { slot in slot.zoneName == lot.lotName }) { slot in
-                                    HStack {
-                                        Text(slot.zoneName)
-                                        ScrollView(.horizontal, showsIndicators: false) {
-                                            HStack {
-                                                Spacer()
-                                                Text(slot.badgeId)
-                                            }.containerRelativeFrame(.horizontal, alignment: .trailing)
-                                        }
-                                        Text("\(value: slot.bayNumber)")
-                                        NavigationLink(destination: EditParkedItem(oldSlot: slot)) {
-                                        }
-                                    }
-                                }
-                            } else {
-                                ForEach(parkingLots[mainLot].slots.filter { slot in slot.bayNumber == Int(slotSearchNumber)}) { slot in
-                                    HStack {
-                                        Text(slot.zoneName)
-                                        ScrollView(.horizontal, showsIndicators: false) {
-                                            HStack {
-                                                Spacer()
-                                                Text(slot.badgeId)
-                                            }.containerRelativeFrame(.horizontal, alignment: .trailing)
-                                        }
-                                        Text("\(value: slot.bayNumber)")
-                                        NavigationLink(destination: EditParkedItem(oldSlot: slot))  {
-                                        }
-                                    }
-                                }
-                            }
-                        }, header: {
+
+                HStack {
+                    Picker(selection: $selectedLotId, label: Text("Current Lot:")) {
+                        ForEach(0 ..< parkingLots.count, id: \.self) {
+                            Text(parkingLots[$0].lotName)
+                        }
+                        Text("All").tag(MAX_ZONES)
+                    }.pickerStyle(.segmented)
+                }.padding(10)
+
+                List {
+                    if slotSearchNumber.isEmpty {
+                        ForEach(parkingLots[mainLot].slots.filter {
+                            filterSlot in (selectedLotId == MAX_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName) }) { slot in
                             HStack {
-                                Text("Lot: \(lot.lotName)")
-                                NavigationLink(destination: EditLotName(oldLot: lot), label: {
-                                    Text("Rename")
-                                })
+                                Text(slot.zoneName)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        Spacer()
+                                        Text(slot.badgeId)
+                                    }.containerRelativeFrame(.horizontal, alignment: .trailing)
+                                }
+                                Text("\(value: slot.bayNumber)")
+                                NavigationLink(destination: EditParkedItem(oldSlot: slot)) {
+                                }
                             }
-                        })
-                    }.listStyle(.sidebar)
-                }
+                        }
+                    } else {
+                        ForEach(parkingLots[mainLot].slots.filter { filterSlot in (filterSlot.bayNumber == Int(slotSearchNumber))}) { slot in
+                            HStack {
+                                Text(slot.zoneName)
+                                ScrollView(.horizontal, showsIndicators: false) {
+                                    HStack {
+                                        Spacer()
+                                        Text(slot.badgeId)
+                                    }.containerRelativeFrame(.horizontal, alignment: .trailing)
+                                }
+                                Text("\(value: slot.bayNumber)")
+                                NavigationLink(destination: EditParkedItem(oldSlot: slot))  {
+                                }
+                            }
+                        }
+                    }
+                }.searchable(text: $slotSearchNumber, prompt: "Find parking slot")
+
                 HStack {
                     Button("Delete all", systemImage: "trash.fill", action: {
                         isPresentingAlert = true
@@ -79,7 +82,6 @@ struct SettingsView: View {
                         isPresented: $isPresentingAlert) {
                         Button("Yes, delete all", role: .destructive) {
                             do {
-//                                try modelContext.delete(model: ParkingSlot.self)
                                 try modelContext.delete(model: CombinedZoneParkingSlot.self)
                                 dismiss()
                             } catch {
@@ -88,6 +90,13 @@ struct SettingsView: View {
                       }
                     }
                     Spacer()
+                    if (selectedLotId != MAX_ZONES) {
+                        Text("Lot: \(parkingLots[selectedLotId].lotName)")
+                        NavigationLink(destination: EditLotName(oldLot: parkingLots[selectedLotId]), label: {
+                            Text("Rename")
+                        })
+                        Spacer()
+                    }
                     Button("Add another lot", systemImage: "document.badge.plus.fill", action: {
                         isPresentingAddLot = true
                     }).accentColor(.red)
@@ -99,13 +108,13 @@ struct SettingsView: View {
                                 try modelContext.save()
                                 dismiss()
                             } catch {
-                                print("Failed to delete all.")
+                                print("Failed to save added lot.")
                             }
                         }
                     }
                 }.padding(20)
             }
-        }.searchable(text: $slotSearchNumber, prompt: "Find by parking slot number")
+        }
     }
 }
 
