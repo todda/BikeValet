@@ -10,7 +10,7 @@ import SwiftData
 internal import Combine
 
 struct SettingsView: View {
-    let MAX_ZONES = 1000
+    static let MAX_ZONES = 1000
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) var dismiss
     @Query private var parkingLots: [ParkingLot]
@@ -19,7 +19,7 @@ struct SettingsView: View {
     @State private var isPresentingEditLot: Bool = false
     @State var slotSearchNumber = ""
     @State var newLotName = ""
-    @State var selectedLotId: Int = 0
+    @State var selectedLotId: Int = MAX_ZONES
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
@@ -32,17 +32,17 @@ struct SettingsView: View {
 
                 HStack {
                     Picker(selection: $selectedLotId, label: Text("Current Lot:")) {
+                        Text("All").tag(SettingsView.MAX_ZONES)
                         ForEach(0 ..< parkingLots.count, id: \.self) {
                             Text(parkingLots[$0].lotName)
                         }
-                        Text("All").tag(MAX_ZONES)
                     }.pickerStyle(.segmented)
                 }.padding(10)
 
                 List {
                     if slotSearchNumber.isEmpty {
                         ForEach(parkingLots[mainLot].slots.filter {
-                            filterSlot in (selectedLotId == MAX_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName) }) { slot in
+                            filterSlot in (selectedLotId == SettingsView.MA X_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName) }) { slot in
                             HStack {
                                 Text(slot.zoneName)
                                 ScrollView(.horizontal, showsIndicators: false) {
@@ -90,7 +90,7 @@ struct SettingsView: View {
                       }
                     }
                     Spacer()
-                    if (selectedLotId != MAX_ZONES) {
+                    if (selectedLotId != SettingsView.MAX_ZONES) {
                         Text("Lot: \(parkingLots[selectedLotId].lotName)")
                         NavigationLink(destination: EditLotName(oldLot: parkingLots[selectedLotId]), label: {
                             Text("Rename")
