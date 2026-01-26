@@ -42,7 +42,7 @@ struct SettingsView: View {
                 List {
                     if slotSearchNumber.isEmpty {
                         ForEach(parkingLots[mainLot].slots.filter {
-                            filterSlot in (selectedLotId == SettingsView.MA X_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName) }) { slot in
+                            filterSlot in (selectedLotId == SettingsView.MAX_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName) }) { slot in
                             HStack {
                                 Text(slot.zoneName)
                                 ScrollView(.horizontal, showsIndicators: false) {
