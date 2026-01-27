@@ -50,7 +50,7 @@ struct EditLotName: View {
                 Spacer()
                 HStack {
                     Button("Remove") {
-                        oldLot.slots.removeAll(where: { $0.zoneName == oldLot.lotName })
+                        oldLot.slots!.removeAll(where: { $0.zoneName == oldLot.lotName })
                         modelContext.delete(oldLot)
                         do {
                             try modelContext.save()
@@ -69,12 +69,12 @@ struct EditLotName: View {
                         // Move slots over
                         for lot in 0..<parkingLots.count {
                             print("dumping lot:\(parkingLots[lot].lotName) at index: \(lot)")
-                            for slot in parkingLots[lot].slots {
+                            for slot in parkingLots[lot].slots! {
                                 print("dumping id:\(slot.badgeId) zone:\(slot.zoneName)")
                             }
                         }
-                        let mainLot = parkingLots.firstIndex(where: { $0.slots.count > 0 })!
-                        print("moving \(parkingLots[mainLot].slots.filter({ $0.zoneName == oldLot.lotName}).count) parked items")
+                        let mainLot = parkingLots.firstIndex(where: { $0.slots!.count > 0 })!
+                        print("moving \(parkingLots[mainLot].slots!.filter({ $0.zoneName == oldLot.lotName}).count) parked items")
                         parkingLots[mainLot].moveZone(from: oldLot.lotName, to: newLotName)
 
                         // Remove old lot

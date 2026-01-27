@@ -11,12 +11,14 @@ import SwiftData
 @Model
 final class ParkingLot {
     @Relationship(deleteRule: .cascade, inverse: \CombinedZoneParkingSlot.lot)
-    var lotName: String
-    var slots: [CombinedZoneParkingSlot]
+    var lotName: String = "Unknown Lot"
+    var slots: [CombinedZoneParkingSlot]? = []
     var isExpanded: Bool = true
 
     func highestOccupiedSlot() -> Int {
         var returnBayNumber = 0
+
+        guard let slots else { return returnBayNumber }
 
         for i in 0..<slots.count {
             if slots[i].bayNumber > returnBayNumber {
@@ -27,6 +29,7 @@ final class ParkingLot {
     }
 
     func moveZone(from: String, to: String) -> Void {
+        guard let slots else { return }
         print("\(slots.count) items in lot")
         for slot in slots where slot.zoneName == from {
             print("moving zone from: \(slot.zoneName) to: \(to)")
@@ -36,6 +39,8 @@ final class ParkingLot {
 
     func nextBestOccupiedSlot() -> Int {
         var bestBayNumber = 1
+
+        guard let slots else { return bestBayNumber }
 
         for _ in 0..<slots.count {
             if slots.contains(where: { $0.bayNumber == bestBayNumber}) {
@@ -53,11 +58,12 @@ final class ParkingLot {
 
 @Model
 final class CombinedZoneParkingSlot {
-    var lot: ParkingLot
-    var zoneName: String
-    var timestamp: Date
-    var badgeId: String
-    var bayNumber: Int
+    @Relationship(inverse: \ParkingLot.slots)
+    var lot: ParkingLot? = nil
+    var zoneName: String = "Unknown Zone"
+    var timestamp: Date = Date.now
+    var badgeId: String = "Unknown Badge"
+    var bayNumber: Int = 0
 
     init(badgeId: String, bayNumber: Int = 0, lot: ParkingLot, zone: String = "") {
         self.timestamp = Date.now
@@ -75,7 +81,7 @@ final class CombinedZoneParkingSlot {
 @Model
 final class ParkingSlot {
     //@Relationship(deleteRule: .cascade, inverse: \ParkingLot.slots)
-    var lot: ParkingLot
+    var lot: ParkingLot?
     var timestamp: Date
     var badgeId: String
     var bayNumber: Int

@@ -24,7 +24,7 @@ struct SettingsView: View {
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
     var body: some View {
-        let mainLot = parkingLots.firstIndex(where: { ($0.slots.count > 0 || $0.lotName == "Main") })!
+        let mainLot = parkingLots.firstIndex(where: { ($0.slots!.count > 0 || $0.lotName == "Main") })!
 
         NavigationStack {
             VStack {
@@ -41,7 +41,7 @@ struct SettingsView: View {
 
                 List {
                     if slotSearchNumber.isEmpty {
-                        ForEach(parkingLots[mainLot].slots.filter {
+                        ForEach(parkingLots[mainLot].slots!.filter {
                             filterSlot in (selectedLotId == SettingsView.MAX_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName) }) { slot in
                             HStack {
                                 Text(slot.zoneName)
@@ -57,7 +57,7 @@ struct SettingsView: View {
                             }
                         }
                     } else {
-                        ForEach(parkingLots[mainLot].slots.filter { filterSlot in (filterSlot.bayNumber == Int(slotSearchNumber))}) { slot in
+                        ForEach(parkingLots[mainLot].slots!.filter { filterSlot in (filterSlot.bayNumber == Int(slotSearchNumber))}) { slot in
                             HStack {
                                 Text(slot.zoneName)
                                 ScrollView(.horizontal, showsIndicators: false) {

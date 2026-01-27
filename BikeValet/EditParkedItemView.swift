@@ -78,7 +78,7 @@ struct EditParkedItem: View {
                             .onAppear() { newBayNumber = "\(oldSlot.bayNumber)" }
                             .onSubmit {
                                 // check if slot is valid
-                                if (parkingSlots.contains(where: {$0.bayNumber == Int(newBayNumber) && $0.lot.lotName == oldSlot.zoneName})) {
+                                if (parkingSlots.contains(where: {$0.bayNumber == Int(newBayNumber) && $0.lot!.lotName == oldSlot.zoneName})) {
                                     isShowingErrorMessage = true
                                 } else {
                                     isShowingErrorMessage = false
@@ -104,7 +104,7 @@ struct EditParkedItem: View {
                 Spacer()
                 HStack {
                     Button("Remove") {
-                        oldSlot.lot.slots.removeAll(where: { $0.badgeId == oldSlot.badgeId })
+                        oldSlot.lot!.slots!.removeAll(where: { $0.badgeId == oldSlot.badgeId })
                         modelContext.delete(oldSlot)
                         do {
                             try modelContext.save()
@@ -115,18 +115,17 @@ struct EditParkedItem: View {
                     }
                     Spacer()
                     Button("Save") {
-                        let mainLot = parkingLots.firstIndex(where: { $0.slots.count > 0 })!
-//                        let newSlot = ParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[selectedLot])
+                        let mainLot = parkingLots.firstIndex(where: { $0.slots!.count > 0 })!
                         let newSlot = CombinedZoneParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[mainLot], zone:parkingLots[selectedLot].lotName)
-                        oldSlot.lot.slots.removeAll(where: { $0.badgeId == oldSlot.badgeId })
-                        if (newSlot.bayNumber > (parkingLots[mainLot].slots.count + 1)) {
+                        oldSlot.lot!.slots!.removeAll(where: { $0.badgeId == oldSlot.badgeId })
+                        if (newSlot.bayNumber > (parkingLots[mainLot].slots!.count + 1)) {
                             // TODO: custom error message variable?
                             isShowingErrorMessage = true
                         } else {
-                            if (newSlot.bayNumber < parkingLots[selectedLot].slots.count) {
-                                parkingLots[mainLot].slots.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
+                            if (newSlot.bayNumber < parkingLots[selectedLot].slots!.count) {
+                                parkingLots[mainLot].slots!.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
                             } else {
-                                parkingLots[mainLot].slots.append(newSlot)
+                                parkingLots[mainLot].slots!.append(newSlot)
                             }
                             modelContext.delete(oldSlot)
                             modelContext.insert(newSlot)
