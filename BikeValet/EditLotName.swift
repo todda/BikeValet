@@ -2,7 +2,7 @@
 //  EditLotName.swift
 //  BikeValet
 //
-//  Created by Todd Anderson on 11/20/25.
+//  Created on 11/20/25.
 //
 
 import SwiftUI
@@ -94,6 +94,5 @@ struct EditLotName: View {
 }
 
 #Preview {
-//    EditParkedItem(oldSlot: ParkingSlot(badgeId: "12345123451234512345", lot: ParkingLot(name: "main")))
     EditLotName(oldLot: ParkingLot(name: "main"))
 }

@@ -2,7 +2,7 @@
 //  Item.swift
 //  BikeValet
 //
-//  Created by Todd Anderson on 11/10/25.
+//  Created on 11/10/25.
 //
 
 import Foundation
@@ -80,7 +80,6 @@ final class CombinedZoneParkingSlot {
 
 @Model
 final class ParkingSlot {
-    //@Relationship(deleteRule: .cascade, inverse: \ParkingLot.slots)
     var lot: ParkingLot?
     var timestamp: Date
     var badgeId: String

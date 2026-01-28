@@ -2,7 +2,7 @@
 //  EditParkedItemView.swift
 //  BikeValet
 //
-//  Created by Todd Anderson on 11/20/25.
+//  Created on 11/20/25.
 //
 
 import SwiftUI
@@ -30,6 +30,7 @@ struct EditParkedItem: View {
                             HStack {
                                 Spacer()
                                 Text("\(oldSlot.badgeId)").font(.system(size: 26))
+                                    .textSelection(.enabled)
                             }.containerRelativeFrame(.horizontal, alignment: .trailing)
                         }
                     }
@@ -42,6 +43,7 @@ struct EditParkedItem: View {
                         Text("Bay:").font(.system(size: 26))
                         Spacer()
                         Text("\(value: oldSlot.bayNumber)").font(.system(size: 26))
+                            .textSelection(.enabled)
                     }
                 }
                 .padding(20)
@@ -57,6 +59,7 @@ struct EditParkedItem: View {
                             HStack {
                                 Spacer()
                                 Text("\(oldSlot.badgeId)").font(.system(size: 26))
+                                    .textSelection(.enabled)
                             }.containerRelativeFrame(.horizontal, alignment: .trailing)
                         }
                     }
@@ -144,6 +147,5 @@ struct EditParkedItem: View {
 }
 
 #Preview {
-//    EditParkedItem(oldSlot: ParkingSlot(badgeId: "12345123451234512345", lot: ParkingLot(name: "main")))
     EditParkedItem(oldSlot: CombinedZoneParkingSlot(badgeId: "12345123451234512345", lot: ParkingLot(name: "main")))
 }

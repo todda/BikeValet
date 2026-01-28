@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  BikeValet
 //
-//  Created by Todd Anderson on 11/10/25.
+//  Created on 11/10/25.
 //
 
 import SwiftUI
@@ -62,15 +62,10 @@ struct ContentView: View {
                         occupiedSlot = parkingSlots.first(where: { $0.badgeId == cardNumber })
                         if ((occupiedSlot) != nil) {
                             checkedIn = true
-                            //occupiedSlot!.lot.slots.remove(at: occupiedSlot!.bayNumber)
-                            //occupiedSlot!.lot.slots.removeAll(where: { $0.bayNumber == occupiedSlot!.bayNumber })
-                            //modelContext.delete(occupiedSlot!)
                         } else {
                             checkedIn = false
-//                            occupiedSlot = ParkingSlot(badgeId: cardNumber, lot: parkingLots[selectedLotId])
                             occupiedSlot = CombinedZoneParkingSlot(badgeId: cardNumber, lot: parkingLots[mainLot], zone: parkingLots[selectedLotId].lotName)
                             parkingLots[mainLot].slots!.append(occupiedSlot!)
-                            //modelContext.insert(occupiedSlot!)
                             do {
                                 try modelContext.save()
                             } catch {
@@ -84,17 +79,18 @@ struct ContentView: View {
                     }
 
                 Text("Last card scanned: \(lastCardNumber)")
+                    .textSelection(.enabled)
 
                 HStack {
-                    Text("\(checkedIn ? "Out" : "In")").font(.system(size: 26))
-                        .frame(width: UIScreen.main.bounds.size.width * 0.2)
-                    Text("\(occupiedSlot?.zoneName ?? "Unknown Lot")").font(.system(size: 26))
-                        .frame(width: UIScreen.main.bounds.size.width * 0.4)
+                    Text("\(checkedIn ? "-" : "+")\(occupiedSlot?.zoneName ?? "Unknown Lot")").font(.system(size: 56))
+                        .fontWeight(.bold)
+                        .frame(width: UIScreen.main.bounds.size.width * 0.6)
                     Text("\(value: occupiedSlot?.bayNumber ?? 0)").font(.system(size: 106))
-                        .frame(width: UIScreen.main.bounds.size.width * 0.2)
+                        .textSelection(.enabled)
+                        .fontWeight(.heavy)
+                        .frame(width: UIScreen.main.bounds.size.width * 0.4)
                 }
-                .frame(height: UIScreen.main.bounds.size.height * 0.3)
-                .fixedSize()
+                .frame(height: UIScreen.main.bounds.size.height * 0.2)
                 .frame(maxWidth: .infinity)
                 .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill((checkedIn ? Color.accentColor : Color.green).opacity(0.50)))
 
