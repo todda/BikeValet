@@ -82,7 +82,7 @@ struct ContentView: View {
                     .textSelection(.enabled)
 
                 HStack {
-                    Text("\(checkedIn ? "-" : "+")\(occupiedSlot?.zoneName ?? "Unknown Lot")").font(.system(size: 56))
+                    Text("\(checkedIn ? "-" : "+") \(occupiedSlot?.zoneName ?? "Unknown Lot")").font(.system(size: 56))
                         .fontWeight(.bold)
                         .frame(width: UIScreen.main.bounds.size.width * 0.6)
                     Text("\(value: occupiedSlot?.bayNumber ?? 0)").font(.system(size: 106))
