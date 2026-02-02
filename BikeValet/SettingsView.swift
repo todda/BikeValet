@@ -9,6 +9,21 @@ import SwiftUI
 import SwiftData
 internal import Combine
 
+struct SimpleCheckToggleStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Button {
+            configuration.isOn.toggle()
+        } label: {
+            Label {
+                configuration.label
+            } icon: {
+                Image(systemName: configuration.isOn ? "checkmark.square" : "square")
+            }
+        }
+        .buttonStyle(.plain)
+    }
+}
+
 struct SettingsView: View {
     static let MAX_ZONES = 1000
     @Environment(\.modelContext) private var modelContext
@@ -20,6 +35,7 @@ struct SettingsView: View {
     @State var slotSearchNumber = ""
     @State var newLotName = ""
     @State var selectedLotId: Int = MAX_ZONES
+    @State var selectedItems : [Bool] = Array(repeating: false, count: 1000)
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
@@ -39,11 +55,14 @@ struct SettingsView: View {
                     }.pickerStyle(.segmented)
                 }.padding(10)
 
-                List {
+                List() {
                     if slotSearchNumber.isEmpty {
-                        ForEach(parkingLots[mainLot].slots!.filter {
-                            filterSlot in (selectedLotId == SettingsView.MAX_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName) }) { slot in
+                        let filteredArray = Array(parkingLots[mainLot].slots!.filter {
+                            filterSlot in (selectedLotId == SettingsView.MAX_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName)})
+                        ForEach(filteredArray.indices, id: \.self) { index in
+                            let slot = filteredArray[index]
                             HStack {
+                                Toggle("", isOn: $selectedItems[index]).toggleStyle(SimpleCheckToggleStyle())
                                 Text(slot.zoneName)
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
@@ -52,12 +71,19 @@ struct SettingsView: View {
                                     }.containerRelativeFrame(.horizontal, alignment: .trailing)
                                 }
                                 Text("\(value: slot.bayNumber)")
-                                NavigationLink(destination: EditParkedItem(oldSlot: slot)) {
-                                }
+                                NavigationLink(destination: EditMultipleParkedItem(oldSlots: selectedItems.contains(where: {$0 == true}) ?
+                                    filteredArray.enumerated().filter { (index, _) in
+                                        return selectedItems[index] == true
+                                    }.map { $0.element }
+                                    : [slot])
+                                )  {}
                             }
                         }
                     } else {
-                        ForEach(parkingLots[mainLot].slots!.filter { filterSlot in (filterSlot.bayNumber == Int(slotSearchNumber))}) { slot in
+                        let filteredArray = Array(parkingLots[mainLot].slots!.filter {
+                            filterSlot in (filterSlot.bayNumber == Int(slotSearchNumber))})
+                        ForEach(filteredArray.indices, id: \.self) { index in
+                            let slot = filteredArray[index]
                             HStack {
                                 Text(slot.zoneName)
                                 ScrollView(.horizontal, showsIndicators: false) {
@@ -72,7 +98,8 @@ struct SettingsView: View {
                             }
                         }
                     }
-                }.searchable(text: $slotSearchNumber, prompt: "Find parking slot")
+                }
+                .searchable(text: $slotSearchNumber, prompt: "Find parking slot")
 
                 HStack {
                     Button("Delete all", systemImage: "trash.fill", action: {
