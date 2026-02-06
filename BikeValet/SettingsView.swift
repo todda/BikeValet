@@ -147,6 +147,10 @@ struct SettingsView: View {
                     }
                 }.padding(20)
             }
+        }.onAppear() {
+            for index in selectedItems.indices {
+                selectedItems[index].selected = false
+            }
         }
     }
 }
