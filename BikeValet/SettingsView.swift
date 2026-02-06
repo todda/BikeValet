@@ -23,6 +23,11 @@ struct SimpleCheckToggleStyle: ToggleStyle {
         .buttonStyle(.plain)
     }
 }
+    
+struct SelectedItem: Identifiable {
+    let id = UUID()
+    var selected = false
+}
 
 struct SettingsView: View {
     static let MAX_ZONES = 1000
@@ -35,7 +40,7 @@ struct SettingsView: View {
     @State var slotSearchNumber = ""
     @State var newLotName = ""
     @State var selectedLotId: Int = MAX_ZONES
-    @State var selectedItems : [Bool] = Array(repeating: false, count: 1000)
+    @State private var selectedItems : [SelectedItem] = Array(repeating: SelectedItem(), count: 1000)
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
@@ -59,10 +64,11 @@ struct SettingsView: View {
                     if slotSearchNumber.isEmpty {
                         let filteredArray = Array(parkingLots[mainLot].slots!.filter {
                             filterSlot in (selectedLotId == SettingsView.MAX_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName)})
+                        Toggle(sources: $selectedItems, isOn: \.selected) {Text("Check all")}.toggleStyle(SimpleCheckToggleStyle())
                         ForEach(filteredArray.indices, id: \.self) { index in
                             let slot = filteredArray[index]
                             HStack {
-                                Toggle("", isOn: $selectedItems[index]).toggleStyle(SimpleCheckToggleStyle())
+                                Toggle("", isOn: $selectedItems[index].selected).toggleStyle(SimpleCheckToggleStyle())
                                 Text(slot.zoneName)
                                 ScrollView(.horizontal, showsIndicators: false) {
                                     HStack {
@@ -71,13 +77,13 @@ struct SettingsView: View {
                                     }.containerRelativeFrame(.horizontal, alignment: .trailing)
                                 }
                                 Text("\(value: slot.bayNumber)")
-                                NavigationLink(destination: EditMultipleParkedItem(oldSlots: selectedItems.contains(where: {$0 == true}) ?
+                                NavigationLink(destination: EditMultipleParkedItem(oldSlots: selectedItems.contains(where: {$0.selected == true}) ?
                                     filteredArray.enumerated().filter { (index, _) in
-                                        return selectedItems[index] == true
+                                    return selectedItems[index].selected == true
                                     }.map { $0.element }
                                     : [slot])
-                                )  {}
-                            }
+                                ) {}
+                                }
                         }
                     } else {
                         let filteredArray = Array(parkingLots[mainLot].slots!.filter {

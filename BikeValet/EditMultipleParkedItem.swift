@@ -23,6 +23,7 @@ struct EditMultipleParkedItem: View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 10) {
                 Text("From:").font(.system(size: 26))
+                List {
                     ForEach(oldSlots.indices, id: \.self) { index in
                         VStack(alignment: .leading, spacing: 0) {
                             HStack {
@@ -44,20 +45,10 @@ struct EditMultipleParkedItem: View {
                         .frame(height: 80)
                         .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill(Color.gray.opacity(0.10)))
                     }
+                }
 
                 Text("To:").font(.system(size: 26))
                 VStack(alignment: .leading, spacing: 10) {
-                    HStack {
-                        Text("ID:").font(.system(size: 26))
-                        Spacer()
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack {
-                                Spacer()
-                                Text("\(oldSlots[0].badgeId)").font(.system(size: 26))
-                                    .textSelection(.enabled)
-                            }.containerRelativeFrame(.horizontal, alignment: .trailing)
-                        }
-                    }
                     HStack {
                         Text("Lot:").font(.system(size: 26))
                         Spacer()
@@ -67,31 +58,9 @@ struct EditMultipleParkedItem: View {
                             }
                         }.frame(width: 120.0, alignment: .trailing).labelsHidden()
                     }
-                    HStack {
-                        Text("Bay:").font(.system(size: 26))
-                        Spacer()
-                        TextField("new bay", text: $newBayNumber)
-                            .font(.system(size: 26))
-                            .multilineTextAlignment(.trailing)
-                            .onAppear() {
-                                if (oldSlots.count > 1) {
-                                    newBayNumber = "*"
-                                } else {
-                                    newBayNumber = "\(oldSlots[0].bayNumber)"
-                                }
-                            }
-                            .onSubmit {
-                                // check if slot is valid
-                                if (parkingSlots.contains(where: {$0.bayNumber == Int(newBayNumber) && $0.lot!.lotName == oldSlots[0].zoneName})) {
-                                    isShowingErrorMessage = true
-                                } else {
-                                    isShowingErrorMessage = false
-                                }
-                            }
-                    }
                 }
                 .padding(20)
-                .frame(height: 180)
+                .frame(height: 50)
                 .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill(Color.blue.opacity(0.20)))
 
                 if (isShowingErrorMessage) {
