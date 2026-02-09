@@ -8,6 +8,12 @@
 import SwiftUI
 import SwiftData
 
+struct HistoryItem: Identifiable {
+    var id: UUID = UUID()
+    var zone = ""
+    var bay = ""
+}
+
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var parkingLots: [ParkingLot]
@@ -19,6 +25,8 @@ struct ContentView: View {
     @State private var checkedIn: Bool = false
     @FocusState private var focusConfirm: Bool
     @State private var occupiedSlot: CombinedZoneParkingSlot? = nil
+    static let MAX_HISTORY = 3
+    @State private var history: [HistoryItem] = Array(repeating: HistoryItem(zone: "unknown", bay: "?"), count: MAX_HISTORY)
 
     var body: some View {
         let mainLot = parkingLots.firstIndex(where: { ($0.slots!.count > 0 || $0.lotName == "Main") })!
@@ -59,6 +67,8 @@ struct ContentView: View {
                         focusConfirm = true
                     }
                     .onSubmit {
+                        history.push(HistoryItem(zone: "\(checkedIn ? "-" : "+") \(occupiedSlot?.zoneName ?? "Unknown Lot")",
+                                                 bay: "\(value: occupiedSlot?.bayNumber ?? 0)"))
                         occupiedSlot = parkingSlots.first(where: { $0.badgeId == cardNumber })
                         if ((occupiedSlot) != nil) {
                             checkedIn = true
@@ -94,6 +104,19 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity)
                 .background(RoundedRectangle(cornerRadius: 50, style: .continuous).fill((checkedIn ? Color.accentColor : Color.green).opacity(0.50)))
 
+                ForEach(history) { historyElement in
+                    HStack {
+                        Text("\(historyElement.zone)").font(.system(size: 28))
+                            .fontWeight(.bold)
+                            .frame(width: UIScreen.main.bounds.size.width * 0.4)
+                        Text(historyElement.bay).font(.system(size: 54))
+                            .textSelection(.enabled)
+                            .fontWeight(.heavy)
+                            .frame(width: UIScreen.main.bounds.size.width * 0.2)
+                    }
+                    .background(RoundedRectangle(cornerRadius: 40, style: .continuous).fill(Color.gray.opacity(0.20)))
+                }
+
                 Spacer()
 
                 HStack {
@@ -108,6 +131,17 @@ struct ContentView: View {
 extension DefaultStringInterpolation {
     mutating func appendInterpolation(value: Int) {
         self.appendLiteral("\(value)")
+    }
+}
+
+extension Array {
+    mutating func push(_ newObject: Element) {
+        for (index, element) in self.enumerated().reversed() {
+            if (self.count-1 != index) {
+                self[index + 1] = element
+            }
+        }
+        self[0] = newObject
     }
 }
 
