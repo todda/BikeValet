@@ -91,12 +91,8 @@ struct EditMultipleParkedItem: View {
                     Button("Save") {
                         let mainLot = parkingLots.firstIndex(where: { $0.slots!.count > 0 })!
                         for index in oldSlots.indices {
-                            var savedBayNumber = Int(newBayNumber) ?? 0
-                            if (oldSlots.count > 1) {
-                                savedBayNumber = oldSlots[index].bayNumber
-                            }
                             let newSlot = CombinedZoneParkingSlot(badgeId: oldSlots[index].badgeId,
-                                                                  bayNumber: savedBayNumber,
+                                                                  bayNumber: oldSlots[index].bayNumber,
                                                                   lot: parkingLots[mainLot],
                                                                   zone:parkingLots[selectedLot].lotName)
                             modelContext.delete(oldSlots[index])

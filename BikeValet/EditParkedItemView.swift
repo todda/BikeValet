@@ -120,7 +120,7 @@ struct EditParkedItem: View {
                     Button("Save") {
                         let mainLot = parkingLots.firstIndex(where: { $0.slots!.count > 0 })!
                         let newSlot = CombinedZoneParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[mainLot], zone:parkingLots[selectedLot].lotName)
-                        oldSlot.lot!.slots!.removeAll(where: { $0.badgeId == oldSlot.badgeId })
+                        parkingLots[mainLot].slots!.removeAll(where: { $0.badgeId == oldSlot.badgeId })
                         if (newSlot.bayNumber > (parkingLots[mainLot].slots!.count + 1)) {
                             // TODO: custom error message variable?
                             isShowingErrorMessage = true

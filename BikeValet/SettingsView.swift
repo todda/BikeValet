@@ -77,13 +77,16 @@ struct SettingsView: View {
                                     }.containerRelativeFrame(.horizontal, alignment: .trailing)
                                 }
                                 Text("\(value: slot.bayNumber)")
-                                NavigationLink(destination: EditMultipleParkedItem(oldSlots: selectedItems.contains(where: {$0.selected == true}) ?
-                                    filteredArray.enumerated().filter { (index, _) in
+                                let selectedSlots = filteredArray.enumerated().filter { (index, _) in
                                     return selectedItems[index].selected == true
-                                    }.map { $0.element }
-                                    : [slot])
-                                ) {}
+                                }.map { $0.element }
+
+                                if (selectedSlots.count > 1) {
+                                    NavigationLink(destination: EditMultipleParkedItem(oldSlots: selectedSlots)) {}
+                                } else {
+                                    NavigationLink(destination: EditParkedItem(oldSlot: slot)) {}
                                 }
+                            }
                         }
                     } else {
                         let filteredArray = Array(parkingLots[mainLot].slots!.filter {
