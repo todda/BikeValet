@@ -97,13 +97,13 @@ struct EditMultipleParkedItem: View {
                                                                   zone:parkingLots[selectedLot].lotName)
                             modelContext.delete(oldSlots[index])
                             modelContext.insert(newSlot)
-                            do {
-                                try modelContext.save()
-                            } catch {
-                                print ("oh no")
-                            }
-                            dismiss()
                         }
+                        do {
+                            try modelContext.save()
+                        } catch {
+                            print ("oh no")
+                        }
+                        dismiss()
                     }
                 }.padding(16)
             }.padding(16)
