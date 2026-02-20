@@ -11,7 +11,6 @@ import SwiftData
 struct EditMultipleParkedItem: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @Query private var parkingSlots: [CombinedZoneParkingSlot]
     @Query private var parkingLots: [ParkingLot]
     @State var oldSlots: [CombinedZoneParkingSlot]
     @State var newBayNumber = ""

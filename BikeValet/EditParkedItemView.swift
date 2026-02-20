@@ -11,7 +11,6 @@ import SwiftData
 struct EditParkedItem: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
-    @Query private var parkingSlots: [CombinedZoneParkingSlot]
     @Query private var parkingLots: [ParkingLot]
     @State var oldSlot: CombinedZoneParkingSlot
     @State var newBayNumber = ""
@@ -19,6 +18,7 @@ struct EditParkedItem: View {
     @State var isShowingErrorMessage = false
 
     var body: some View {
+        let mainLot = parkingLots.firstIndex(where: { $0.slots!.count > 0 })!
         NavigationStack {
             VStack(alignment: .leading, spacing: 20) {
                 Text("From:").font(.system(size: 26))
@@ -81,7 +81,7 @@ struct EditParkedItem: View {
                             .onAppear() { newBayNumber = "\(oldSlot.bayNumber)" }
                             .onSubmit {
                                 // check if slot is valid
-                                if (parkingSlots.contains(where: {$0.bayNumber == Int(newBayNumber) && $0.lot!.lotName == oldSlot.zoneName})) {
+                                if (parkingLots[mainLot].slots!.contains(where: {$0.bayNumber == Int(newBayNumber) && $0.lot!.lotName == oldSlot.zoneName})) {
                                     isShowingErrorMessage = true
                                 } else {
                                     isShowingErrorMessage = false
@@ -118,27 +118,19 @@ struct EditParkedItem: View {
                     }
                     Spacer()
                     Button("Save") {
-                        let mainLot = parkingLots.firstIndex(where: { $0.slots!.count > 0 })!
-                        let newSlot = CombinedZoneParkingSlot(badgeId: oldSlot.badgeId, bayNumber: Int(newBayNumber) ?? 0, lot: parkingLots[mainLot], zone:parkingLots[selectedLot].lotName)
-                        parkingLots[mainLot].slots!.removeAll(where: { $0.badgeId == oldSlot.badgeId })
-                        if (newSlot.bayNumber > (parkingLots[mainLot].slots!.count + 1)) {
-                            // TODO: custom error message variable?
-                            isShowingErrorMessage = true
-                        } else {
-                            if (newSlot.bayNumber < parkingLots[selectedLot].slots!.count) {
-                                parkingLots[mainLot].slots!.insert(newSlot, at: Int(newBayNumber) ?? newSlot.bayNumber)
-                            } else {
-                                parkingLots[mainLot].slots!.append(newSlot)
-                            }
-                            modelContext.delete(oldSlot)
-                            modelContext.insert(newSlot)
-                            do {
-                                try modelContext.save()
-                            } catch {
-                                print ("oh no")
-                            }
-                            dismiss()
+                        let newSlot = CombinedZoneParkingSlot(badgeId: oldSlot.badgeId,
+                                                              bayNumber: Int(newBayNumber) ?? 0,
+                                                              lot: parkingLots[mainLot],
+                                                              zone:parkingLots[selectedLot].lotName)
+
+                        modelContext.delete(oldSlot)
+                        modelContext.insert(newSlot)
+                        do {
+                            try modelContext.save()
+                        } catch {
+                            print ("oh no")
                         }
+                        dismiss()
                     }
                 }.padding(16)
             }.padding(16)

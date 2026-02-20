@@ -17,7 +17,6 @@ struct HistoryItem: Identifiable {
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var parkingLots: [ParkingLot]
-    @Query private var parkingSlots: [CombinedZoneParkingSlot]
 
     @State private var selectedLotId: Int = 0
     @State private var cardNumber: String = ""
@@ -29,7 +28,7 @@ struct ContentView: View {
     @State private var history: [HistoryItem] = Array(repeating: HistoryItem(zone: "unknown", bay: "?"), count: MAX_HISTORY)
 
     var body: some View {
-        let mainLot = parkingLots.firstIndex(where: { ($0.slots!.count > 0 || $0.lotName == "Main") })!
+        let mainLot = parkingLots.firstIndex(where: { (nil != $0.slots && ($0.slots!.count > 0 || $0.lotName == "Main")) })!
 
         NavigationStack {
             VStack {
@@ -41,8 +40,8 @@ struct ContentView: View {
                     }
                     Spacer()
                     NavigationLink {
-                        if (parkingSlots.count > 0) {
-                            EditParkedItem(oldSlot: parkingSlots[parkingSlots.count - 1])
+                        if (nil != parkingLots[mainLot].slots && parkingLots[mainLot].slots!.count > 0) {
+                            EditParkedItem(oldSlot: parkingLots[mainLot].slots![parkingLots[mainLot].slots!.count - 1])
                         }
                     } label: {
                         Text("Edit Last")
@@ -69,13 +68,13 @@ struct ContentView: View {
                     .onSubmit {
                         history.push(HistoryItem(zone: "\(checkedIn ? "-" : "+") \(occupiedSlot?.zoneName ?? "Unknown Lot")",
                                                  bay: "\(value: occupiedSlot?.bayNumber ?? 0)"))
-                        occupiedSlot = parkingSlots.first(where: { $0.badgeId == cardNumber })
+                        occupiedSlot = parkingLots[mainLot].slots?.first(where: { $0.badgeId == cardNumber })
                         if ((occupiedSlot) != nil) {
                             checkedIn = true
                         } else {
                             checkedIn = false
                             occupiedSlot = CombinedZoneParkingSlot(badgeId: cardNumber, lot: parkingLots[mainLot], zone: parkingLots[selectedLotId].lotName)
-                            parkingLots[mainLot].slots!.append(occupiedSlot!)
+                            modelContext.insert(occupiedSlot!)
                             do {
                                 try modelContext.save()
                             } catch {
@@ -120,7 +119,7 @@ struct ContentView: View {
                 Spacer()
 
                 HStack {
-                    Text("Current Checkins: \(value: parkingSlots.count)")
+                    Text("Current Checkins: \(value: parkingLots[mainLot].slots!.count)")
                     Spacer()
                 }.padding(16)
             }.padding(16)

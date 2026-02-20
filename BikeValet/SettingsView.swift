@@ -37,12 +37,19 @@ struct SettingsView: View {
     @State private var isPresentingAlert: Bool = false
     @State private var isPresentingAddLot: Bool = false
     @State private var isPresentingEditLot: Bool = false
+    @State private var isPresentingVerify: Bool = false
     @State var slotSearchNumber = ""
     @State var newLotName = ""
     @State var selectedLotId: Int = MAX_ZONES
     @State private var selectedItems : [SelectedItem] = Array(repeating: SelectedItem(), count: 1000)
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
+
+    @State var verifyIds = "all badge ids are unique..."
+    @State var verifyContiguousSlots = "all parking slots are contiguous..."
+    @State var verifyUniqueSlots = "all badge ids are unique..."
+    @State var uniqueIds: [String] = []
+    @State var uniqueBay: [Int] = []
 
     var body: some View {
         let mainLot = parkingLots.firstIndex(where: { ($0.slots!.count > 0 || $0.lotName == "Main") })!
@@ -63,7 +70,7 @@ struct SettingsView: View {
                 List() {
                     if slotSearchNumber.isEmpty {
                         let filteredArray = Array(parkingLots[mainLot].slots!.filter {
-                            filterSlot in (selectedLotId == SettingsView.MAX_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName)})
+                            filterSlot in (selectedLotId == SettingsView.MAX_ZONES ? !filterSlot.zoneName.isEmpty : filterSlot.zoneName == parkingLots[selectedLotId].lotName)}).sorted { $0.bayNumber < $1.bayNumber }
                         Toggle(sources: $selectedItems, isOn: \.selected) {Text("Check all")}.toggleStyle(SimpleCheckToggleStyle())
                         ForEach(filteredArray.indices, id: \.self) { index in
                             let slot = filteredArray[index]
@@ -125,6 +132,37 @@ struct SettingsView: View {
                             }
                       }
                     }
+                    Spacer()
+                    Button("Verify", systemImage: "bolt.heart", action: {
+                        for bayIndex in 1..<parkingLots[mainLot].slots!.count {
+                            if !parkingLots[mainLot].slots!.contains(where: { $0.bayNumber == bayIndex }) {
+                                verifyContiguousSlots += "bay: \(bayIndex) is missing\n"
+                            }
+                        }
+                        for (index, slot) in parkingLots[mainLot].slots!.enumerated() {
+                            if (nil == parkingLots[mainLot].slots![index]) {
+                                verifyContiguousSlots += "index: \(index) is missing\n"
+                            }
+                            if uniqueIds.contains(slot.badgeId) {
+                                verifyUniqueSlots += "id: \(slot.badgeId) occurs more than once.  Last bay: \(slot.bayNumber)\n"
+                            } else {
+                                uniqueIds.append(slot.badgeId)
+                            }
+                            if uniqueBay.contains(slot.bayNumber) {
+                                verifyUniqueSlots += "bay: \(slot.bayNumber) occurs more than once\n"
+                            } else {
+                                uniqueBay.append(slot.bayNumber)
+                            }
+                        }
+                        uniqueIds.removeAll()
+                        uniqueBay.removeAll()
+                        
+                        isPresentingVerify = true
+                    }).accentColor(.blue)
+                        .alert("Verifying Integrity...", isPresented: $isPresentingVerify, actions: {
+                        }, message: {
+                            Text("\(verifyIds)\n\(verifyUniqueSlots)\n\(verifyContiguousSlots)")
+                        })
                     Spacer()
                     if (selectedLotId != SettingsView.MAX_ZONES) {
                         Text("Lot: \(parkingLots[selectedLotId].lotName)")
