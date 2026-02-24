@@ -126,10 +126,11 @@ struct SettingsView: View {
                         Button("Yes, delete all", role: .destructive) {
                             do {
                                 try modelContext.delete(model: CombinedZoneParkingSlot.self)
-                                dismiss()
+                                try modelContext.save()
                             } catch {
                                 print("Failed to delete all.")
                             }
+                            dismiss()
                       }
                     }
                     Spacer()
