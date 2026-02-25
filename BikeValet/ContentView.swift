@@ -73,8 +73,11 @@ struct ContentView: View {
                             checkedIn = true
                         } else {
                             checkedIn = false
-                            occupiedSlot = CombinedZoneParkingSlot(badgeId: cardNumber, lot: parkingLots[mainLot], zone: parkingLots[selectedLotId].lotName)
+                            occupiedSlot = CombinedZoneParkingSlot(badgeId: cardNumber,
+                                                                   lot: parkingLots[mainLot],
+                                                                   zone: parkingLots[selectedLotId].lotName)
                             modelContext.insert(occupiedSlot!)
+
                             do {
                                 try modelContext.save()
                             } catch {

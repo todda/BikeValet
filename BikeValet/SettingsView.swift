@@ -45,9 +45,9 @@ struct SettingsView: View {
     let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     let buildNumber = Bundle.main.infoDictionary?["CFBundleVersion"] as? String
 
-    @State var verifyIds = "all badge ids are unique..."
-    @State var verifyContiguousSlots = "all parking slots are contiguous..."
-    @State var verifyUniqueSlots = "all badge ids are unique..."
+    @State var verifyIds = ""
+    @State var verifyContiguousSlots = ""
+    @State var verifyUniqueSlots = ""
     @State var uniqueIds: [String] = []
     @State var uniqueBay: [Int] = []
 
@@ -135,6 +135,9 @@ struct SettingsView: View {
                     }
                     Spacer()
                     Button("Verify", systemImage: "bolt.heart", action: {
+                        verifyIds = ""
+                        verifyContiguousSlots = ""
+                        verifyUniqueSlots = ""
                         for bayIndex in 1..<parkingLots[mainLot].slots!.count {
                             if !parkingLots[mainLot].slots!.contains(where: { $0.bayNumber == bayIndex }) {
                                 verifyContiguousSlots += "bay: \(bayIndex) is missing\n"
@@ -145,7 +148,7 @@ struct SettingsView: View {
                                 verifyContiguousSlots += "index: \(index) is missing\n"
                             }
                             if uniqueIds.contains(slot.badgeId) {
-                                verifyUniqueSlots += "id: \(slot.badgeId) occurs more than once.  Last bay: \(slot.bayNumber)\n"
+                                verifyIds += "id: \(slot.badgeId) occurs more than once.  Last bay: \(slot.bayNumber)\n"
                             } else {
                                 uniqueIds.append(slot.badgeId)
                             }
@@ -155,6 +158,10 @@ struct SettingsView: View {
                                 uniqueBay.append(slot.bayNumber)
                             }
                         }
+                        if verifyIds.isEmpty { verifyIds = "all badge ids are unique..." }
+                        if verifyContiguousSlots.isEmpty { verifyContiguousSlots = "all parking slots are contiguous..." }
+                        if verifyUniqueSlots.isEmpty { verifyUniqueSlots = "all bays are unique..." }
+
                         uniqueIds.removeAll()
                         uniqueBay.removeAll()
                         
