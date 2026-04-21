@@ -16,6 +16,8 @@ struct HistoryItem: Identifiable {
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
+    @AppStorage("MagicPrizeNumber") private var magicNumber = 0
+    @AppStorage("UsePrizeFeature") private var usePrizeFeature = false
     @Query private var parkingLots: [ParkingLot]
 
     @State private var selectedLotId: Int = 0
@@ -26,6 +28,7 @@ struct ContentView: View {
     @State private var occupiedSlot: CombinedZoneParkingSlot? = nil
     static let MAX_HISTORY = 3
     @State private var history: [HistoryItem] = Array(repeating: HistoryItem(zone: "unknown", bay: "?"), count: MAX_HISTORY)
+    @State private var lastEmoji = String.randomEmoji
 
     var body: some View {
         let mainLot = parkingLots.firstIndex(where: { (nil != $0.slots && ($0.slots!.count > 0 || $0.lotName == "Main")) })!
@@ -47,7 +50,13 @@ struct ContentView: View {
                         Text("Edit Last")
                     }
                 }.padding(16)
-                Spacer()
+
+                if (usePrizeFeature) {
+                    Text(lastEmoji).font(.system(size: 156)).fontWeight(.bold)
+                } else {
+                    Spacer()
+                }
+
                 HStack {
                     Picker(selection: $selectedLotId, label: Text("Current Lot:")) {
                         ForEach(0 ..< parkingLots.count, id: \.self) {
@@ -85,6 +94,11 @@ struct ContentView: View {
                             }
                         }
                         lastCardNumber = cardNumber
+                        if (parkingLots[mainLot].slots!.count == magicNumber) {
+                            lastEmoji = "🎁🎁🎁"
+                        } else {
+                            lastEmoji = String.randomEmoji
+                        }
                         cardNumber = ""
                         focusConfirm = true
                         selectedLotId = 0
@@ -94,13 +108,16 @@ struct ContentView: View {
                     .textSelection(.enabled)
 
                 HStack {
-                    Text("\(checkedIn ? "-" : "+") \(occupiedSlot?.zoneName ?? "Unknown Lot")").font(.system(size: 56))
+                    Text("\(checkedIn ? "➖" : "➕")").font(.system(size: 106))
                         .fontWeight(.bold)
-                        .frame(width: UIScreen.main.bounds.size.width * 0.6)
-                    Text("\(value: occupiedSlot?.bayNumber ?? 0)").font(.system(size: 106))
+                        .frame(width: UIScreen.main.bounds.size.width * 0.15)
+                    Text(" \(occupiedSlot?.zoneName ?? "Unknown Lot")").font(.system(size: 56))
+                        .fontWeight(.bold)
+                        .frame(width: UIScreen.main.bounds.size.width * 0.5)
+                    Text("\(value: occupiedSlot?.bayNumber ?? 999)").font(.system(size: 106))
                         .textSelection(.enabled)
                         .fontWeight(.heavy)
-                        .frame(width: UIScreen.main.bounds.size.width * 0.4)
+                        .frame(width: UIScreen.main.bounds.size.width * 0.35)
                 }
                 .frame(height: UIScreen.main.bounds.size.height * 0.2)
                 .frame(maxWidth: .infinity)
@@ -144,6 +161,38 @@ extension Array {
             }
         }
         self[0] = newObject
+    }
+}
+
+extension String {
+    static var randomEmoji: String {
+        let ranges: [ClosedRange<Int>] = [
+            0x1f600...0x1f64f,
+            0x1f680...0x1f6c5,
+            0x1f6cb...0x1f6d2,
+            0x1f6e0...0x1f6e5,
+            0x1f6f3...0x1f6fa,
+            0x1f7e0...0x1f7eb,
+            0x1f90d...0x1f93a,
+            0x1f93c...0x1f945,
+            0x1f947...0x1f971,
+            0x1f973...0x1f976,
+            0x1f97a...0x1f9a2,
+            0x1f9a5...0x1f9aa,
+            0x1f9ae...0x1f9ca,
+            0x1f9cd...0x1f9ff,
+            0x1fa70...0x1fa73,
+            0x1fa78...0x1fa7a,
+            0x1fa80...0x1fa82,
+            0x1fa90...0x1fa95,        ]
+        let allCodePoints = ranges.flatMap { Array($0) }
+
+        guard let codePoint = allCodePoints.randomElement(),
+              let scalar = UnicodeScalar(codePoint) else {
+            return "😀" // Fallback
+        }
+
+        return String(scalar)
     }
 }
 

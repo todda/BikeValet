@@ -33,6 +33,8 @@ struct SettingsView: View {
     static let MAX_ZONES = 1000
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) var dismiss
+    @AppStorage("MagicPrizeNumber") private var magicNumber = 0
+    @AppStorage("UsePrizeFeature") private var usePrizeFeature = false
     @Query private var parkingLots: [ParkingLot]
     @State private var isPresentingAlert: Bool = false
     @State private var isPresentingAddLot: Bool = false
@@ -57,6 +59,7 @@ struct SettingsView: View {
         NavigationStack {
             VStack {
                 Text("App Version: \(appVersion ?? "0.0.0") build \(buildNumber ?? "0")")
+                Toggle("Enable Prizes (Prize giveaway number: \(magicNumber))", isOn: $usePrizeFeature)
 
                 HStack {
                     Picker(selection: $selectedLotId, label: Text("Current Lot:")) {
@@ -124,6 +127,7 @@ struct SettingsView: View {
                     .confirmationDialog("Are you sure you want to remove all checked in bicycles?",
                         isPresented: $isPresentingAlert) {
                         Button("Yes, delete all", role: .destructive) {
+                            UserDefaults.standard.set(Int.random(in: 0...299), forKey: "MagicPrizeNumber")
                             do {
                                 try modelContext.delete(model: CombinedZoneParkingSlot.self)
                                 try modelContext.save()
@@ -144,7 +148,7 @@ struct SettingsView: View {
                             }
                         }
                         for (index, slot) in parkingLots[mainLot].slots!.enumerated() {
-                            if (nil == parkingLots[mainLot].slots![index]) {
+                            if (nil == parkingLots[mainLot].slots?[index]) {
                                 verifyContiguousSlots += "index: \(index) is missing\n"
                             }
                             if uniqueIds.contains(slot.badgeId) {

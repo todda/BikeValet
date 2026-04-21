@@ -10,6 +10,9 @@ import SwiftData
 
 @main
 struct BikeValetApp: App {
+    @AppStorage("MagicPrizeNumber") private var magicNumber = 0
+    @AppStorage("UsePrizeFeature") private var usePrizeFeature = false
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             ParkingLot.self,
